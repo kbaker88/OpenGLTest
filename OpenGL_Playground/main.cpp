@@ -1,6 +1,8 @@
 #include <Windows.h>
 #include <gl\GL.h>
 #include "definitions.h"
+#include "shader.h"
+#include <glm/glm.hpp>
 
 typedef HGLRC __stdcall wgl_create_context_attribs_arb(HDC hDC,
 	HGLRC hShareContext, const int *attribList);
@@ -55,7 +57,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	PIXELFORMATDESCRIPTOR DesiredPixelFormat = {};
 	DesiredPixelFormat.nSize = sizeof(DesiredPixelFormat);
 	DesiredPixelFormat.nVersion = 1;
-	DesiredPixelFormat.dwFlags = PFD_SUPPORT_OPENGL | 
+	DesiredPixelFormat.dwFlags = PFD_SUPPORT_OPENGL |
 		PFD_DRAW_TO_WINDOW | PFD_DOUBLEBUFFER;
 	DesiredPixelFormat.iPixelType = PFD_TYPE_RGBA;
 	DesiredPixelFormat.cColorBits = 32;
@@ -68,7 +70,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 			&DesiredPixelFormat);
 	if (SuggestedPixelFormatIndex == 0)
 	{
-		MessageBox(0, "Obtaining Suggested Pixel Format Index Failed!", 
+		MessageBox(WindowPtr, "Obtaining Suggested Pixel Format Index Failed!",
 			"Error!",
 			MB_ICONEXCLAMATION | MB_OK);
 	}
@@ -78,7 +80,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		SuggestedPixelFormatIndex,
 		sizeof(SuggestedPixelFormat), &SuggestedPixelFormat))
 	{
-		MessageBox(0, 
+		MessageBox(WindowPtr,
 			"Obtaining Description of a Possible Pixel Format Failed!", "Error!",
 			MB_ICONEXCLAMATION | MB_OK);
 	}
@@ -86,14 +88,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	if (!SetPixelFormat(WindowDeviceContext,
 		SuggestedPixelFormatIndex, &SuggestedPixelFormat))
 	{
-		MessageBox(0, "Setting Pixel Format Failed!", "Error!",
+		MessageBox(WindowPtr, "Setting Pixel Format Failed!", "Error!",
 			MB_ICONEXCLAMATION | MB_OK);
 	}
 
 	HGLRC OpenGLContext = wglCreateContext(WindowDeviceContext);
 	if (OpenGLContext == 0)
 	{
-		MessageBox(0, "Obtaining OpenGL Render Context Failed!", "Error!",
+		MessageBox(WindowPtr, "Obtaining OpenGL Render Context Failed!", "Error!",
 			MB_ICONEXCLAMATION | MB_OK);
 	}
 
@@ -111,13 +113,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 			{
 				WGL_CONTEXT_MAJOR_VERSION_ARB, 4,
 				WGL_CONTEXT_MINOR_VERSION_ARB, 3,
-				WGL_CONTEXT_FLAGS_ARB, 
+				WGL_CONTEXT_FLAGS_ARB,
 				WGL_CONTEXT_DEBUG_BIT_ARB, // TODO: Remove Debug for final
 				WGL_CONTEXT_PROFILE_MASK_ARB,
 				WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB,
 				0
 			};
-			HGLRC ShareContext = 0; 
+			HGLRC ShareContext = 0;
 			HGLRC ModernContext =
 				wglCreateContextAttribsARB(WindowDeviceContext,
 					ShareContext, Attribs);
@@ -134,7 +136,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		}
 		else
 		{
-			MessageBox(0, "wglMakeCurrent Failed!", "Error!",
+			MessageBox(WindowPtr, "wglMakeCurrent Failed!", "Error!",
 				MB_ICONEXCLAMATION | MB_OK);
 		}
 	}
@@ -142,6 +144,135 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	{
 		// TODO: Error
 	}
+
+	//glEnable(GL_DEPTH_TEST);
+	OpenGL_InitializeFunctions();
+
+	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+
+	GLuint VertexShader = glCreateShader(GL_VERTEX_SHADER);
+	glShaderSource(VertexShader, 1, VertexShader_Source, NULL);
+	glCompileShader(VertexShader);
+
+	GLint ErrorResult = 0;
+	glGetShaderiv(VertexShader, GL_COMPILE_STATUS, &ErrorResult);
+	if (ErrorResult == GL_FALSE)
+	{
+		MessageBox(WindowPtr, "Error in compiling VertexShader\n", 0, 0);
+		GLsizei returnedlength;
+		char buffer[256];
+		glGetShaderInfoLog(VertexShader, 256, &returnedlength, buffer);
+		MessageBox(WindowPtr, buffer, 0, 0);
+	}
+
+	GLuint TessellationControlShader = glCreateShader(GL_TESS_CONTROL_SHADER);
+	glShaderSource(TessellationControlShader, 1, TessellationControl_Source, NULL);
+	glCompileShader(TessellationControlShader);
+
+	glGetShaderiv(TessellationControlShader, GL_COMPILE_STATUS, &ErrorResult);
+	if (ErrorResult == GL_FALSE)
+	{
+		MessageBox(WindowPtr, "Error in compiling TessellationControlShader\n", 0, 0);
+		GLsizei returnedlength;
+		char buffer[256];
+		glGetShaderInfoLog(TessellationControlShader, 256, &returnedlength, buffer);
+		MessageBox(WindowPtr, buffer, 0, 0);
+	}
+
+	GLuint TessellationEvalShader = glCreateShader(GL_TESS_EVALUATION_SHADER);
+	glShaderSource(TessellationEvalShader, 1, TessellationEval_Source, NULL);
+	glCompileShader(TessellationEvalShader);
+
+	glGetShaderiv(TessellationEvalShader, GL_COMPILE_STATUS, &ErrorResult);
+	if (ErrorResult == GL_FALSE)
+	{
+		MessageBox(WindowPtr, "Error in compiling TessellationEvalShader\n", 0, 0);
+		GLsizei returnedlength;
+		char buffer[256];
+		glGetShaderInfoLog(TessellationEvalShader, 256, &returnedlength, buffer);
+		MessageBox(WindowPtr, buffer, 0, 0);
+	}
+
+	GLuint FragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+	glShaderSource(FragmentShader, 1, FragmentShader_Source, NULL);
+	glCompileShader(FragmentShader);
+
+	glGetShaderiv(FragmentShader, GL_COMPILE_STATUS, &ErrorResult);
+	if (ErrorResult == GL_FALSE)
+	{
+		MessageBox(WindowPtr, "Error in compiling FragmentShader\n", 0, 0);
+		GLsizei returnedlength;
+		char buffer[256];
+		glGetShaderInfoLog(FragmentShader, 256, &returnedlength, buffer);
+		MessageBox(WindowPtr, buffer, 0, 0);
+	}
+
+	GLuint ShaderProgram = glCreateProgram();
+	glAttachShader(ShaderProgram, VertexShader);
+	glGetProgramiv(ShaderProgram, GL_ATTACHED_SHADERS, &ErrorResult);
+	if (ErrorResult == GL_FALSE)
+	{
+		MessageBox(WindowPtr, "Error in attaching VertexShader\n", 0, 0);
+		GLsizei returnedlength;
+		char buffer[256];
+		glGetProgramInfoLog(ShaderProgram, 256, &returnedlength, buffer);
+		MessageBox(WindowPtr, buffer, 0, 0);
+	}
+
+	glAttachShader(ShaderProgram, TessellationControlShader);
+	glGetProgramiv(ShaderProgram, GL_ATTACHED_SHADERS, &ErrorResult);
+	if (ErrorResult == GL_FALSE)
+	{
+		MessageBox(WindowPtr, "Error in attaching TessellationControlShader\n", 0, 0);
+		GLsizei returnedlength;
+		char buffer[256];
+		glGetProgramInfoLog(ShaderProgram, 256, &returnedlength, buffer);
+		MessageBox(WindowPtr, buffer, 0, 0);
+	}
+
+	glAttachShader(ShaderProgram, TessellationEvalShader);
+	glGetProgramiv(ShaderProgram, GL_ATTACHED_SHADERS, &ErrorResult);
+	if (ErrorResult == GL_FALSE)
+	{
+		MessageBox(WindowPtr, "Error in attaching TessellationEvalShader\n", 0, 0);
+		GLsizei returnedlength;
+		char buffer[256];
+		glGetProgramInfoLog(ShaderProgram, 256, &returnedlength, buffer);
+		MessageBox(WindowPtr, buffer, 0, 0);
+	}
+
+	glAttachShader(ShaderProgram, FragmentShader);
+	glGetProgramiv(ShaderProgram, GL_ATTACHED_SHADERS, &ErrorResult);
+	if (ErrorResult == GL_FALSE)
+	{
+		MessageBox(WindowPtr, "Error in attaching FragmentShader\n", 0, 0);
+		GLsizei returnedlength;
+		char buffer[256];
+		glGetProgramInfoLog(ShaderProgram, 256, &returnedlength, buffer);
+		MessageBox(WindowPtr, buffer, 0, 0);
+	}
+
+	glLinkProgram(ShaderProgram);
+	glGetProgramiv(ShaderProgram, GL_LINK_STATUS, &ErrorResult);
+	if (ErrorResult == GL_FALSE)
+	{
+		MessageBox(WindowPtr, "Error in linking ShaderProgram\n", 0, 0);
+		GLsizei returnedlength;
+		char buffer[256];
+		glGetProgramInfoLog(ShaderProgram, 256, &returnedlength, buffer);
+		MessageBox(WindowPtr, buffer, 0, 0);
+	}
+
+	glDeleteShader(VertexShader);
+	glDeleteShader(TessellationControlShader);
+	glDeleteShader(TessellationEvalShader);
+	glDeleteShader(FragmentShader);
+
+	GLuint VertexArrayObject;
+
+	glCreateVertexArrays(1, &VertexArrayObject);
+	glBindVertexArray(VertexArrayObject);
+
 
 	MSG Message = {};
 
@@ -153,16 +284,30 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 			DispatchMessage(&Message);
 		}
 
-		glClearColor(1.0f, 0.0f, 0.0f, 0.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glClearBufferfv(GL_COLOR, 0,
+			glm::vec4(0.0f, 0.0f, 0.0f, 1.0f).data);
 
+		glUseProgram(ShaderProgram);
+
+		GLfloat ColorAttrib[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+		GLfloat VertexAttrib[] = { 0.5f, 0.0f, 0.0f, 0.0f };
+		glVertexAttrib4fv(0, VertexAttrib);
+		glVertexAttrib4fv(1, ColorAttrib);
+
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		//	glPatchParameteri(GL_PATCH_VERTICES, 3);
+		glDrawArrays(GL_PATCHES, 0, 3);
 
 		if (!SwapBuffers(WindowDeviceContext))
 		{
-			MessageBox(0, "Swapping Buffers Failed!", "Error!",
+			MessageBox(WindowPtr, "Swapping Buffers Failed!", "Error!",
 				MB_ICONEXCLAMATION | MB_OK);
 		}
 	}
+
+	glBindVertexArray(0);
+	glDeleteVertexArrays(1, &VertexArrayObject);
+	glDeleteProgram(ShaderProgram);
 
 	return Message.message;
 }
@@ -192,10 +337,6 @@ LRESULT CALLBACK WndProc(HWND WindowPtr, UINT Message, WPARAM wParam, LPARAM lPa
 			PostQuitMessage(0);
 		}
 	} break;
-	case WM_PAINT:
-	{
-
-	}	break;
 
 	default:
 		return DefWindowProc(WindowPtr, Message, wParam, lParam);
