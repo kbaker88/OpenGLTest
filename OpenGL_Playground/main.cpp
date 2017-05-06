@@ -193,6 +193,20 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		MessageBox(WindowPtr, buffer, 0, 0);
 	}
 
+	GLuint GeometryShader = glCreateShader(GL_GEOMETRY_SHADER);
+	glShaderSource(GeometryShader, 1, Geometry_Source, NULL);
+	glCompileShader(GeometryShader);
+
+	glGetShaderiv(GeometryShader, GL_COMPILE_STATUS, &ErrorResult);
+	if (ErrorResult == GL_FALSE)
+	{
+		MessageBox(WindowPtr, "Error in compiling GeometryShader\n", 0, 0);
+		GLsizei returnedlength;
+		char buffer[256];
+		glGetShaderInfoLog(GeometryShader, 256, &returnedlength, buffer);
+		MessageBox(WindowPtr, buffer, 0, 0);
+	}
+
 	GLuint FragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 	glShaderSource(FragmentShader, 1, FragmentShader_Source, NULL);
 	glCompileShader(FragmentShader);
@@ -241,6 +255,17 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		MessageBox(WindowPtr, buffer, 0, 0);
 	}
 
+	//glAttachShader(ShaderProgram, GeometryShader);
+	//glGetProgramiv(ShaderProgram, GL_ATTACHED_SHADERS, &ErrorResult);
+	//if (ErrorResult == GL_FALSE)
+	//{
+	//	MessageBox(WindowPtr, "Error in attaching GeometryShader\n", 0, 0);
+	//	GLsizei returnedlength;
+	//	char buffer[256];
+	//	glGetProgramInfoLog(ShaderProgram, 256, &returnedlength, buffer);
+	//	MessageBox(WindowPtr, buffer, 0, 0);
+	//}
+
 	glAttachShader(ShaderProgram, FragmentShader);
 	glGetProgramiv(ShaderProgram, GL_ATTACHED_SHADERS, &ErrorResult);
 	if (ErrorResult == GL_FALSE)
@@ -266,6 +291,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	glDeleteShader(VertexShader);
 	glDeleteShader(TessellationControlShader);
 	glDeleteShader(TessellationEvalShader);
+	glDeleteShader(GeometryShader);
 	glDeleteShader(FragmentShader);
 
 	GLuint VertexArrayObject;
@@ -273,7 +299,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	glCreateVertexArrays(1, &VertexArrayObject);
 	glBindVertexArray(VertexArrayObject);
 
-
+	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 	MSG Message = {};
 
 	while (Message.message != WM_QUIT)

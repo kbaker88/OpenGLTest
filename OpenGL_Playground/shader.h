@@ -60,6 +60,24 @@ static const char* TessellationEval_Source[] =
 	"}																\n"
 };
 
+static const char* Geometry_Source[] =
+{
+	"#version 450 core												\n"
+	"																\n"
+	"layout (triangles) in;											\n"
+	"layout (points, max_vertices = 3) out;							\n"
+	"																\n"
+	"void main(void)												\n"
+	"{																\n"
+	"	int i;														\n"
+	"	for (i = 0; i < gl_in.length(); i++)						\n"
+	"	{															\n"
+	"		gl_Position = gl_in[i].gl_Position;						\n"
+	"		EmitVertex();											\n"
+	"	}															\n"
+	"}																\n"
+};
+
 static const char* FragmentShader_Source[] =
 {
 	"#version 450 core												\n"
@@ -73,8 +91,11 @@ static const char* FragmentShader_Source[] =
 	"																\n"
 	"void main(void)												\n"
 	"{																\n"
-	//"	color = fs_in.color;										\n"
-	"	color = vec4(1.0, 0.0, 0.0, 1.0);							\n"
+	//	"	color = fs_in.color;										\n"
+	"	color = vec4(sin(gl_FragCoord.x * 0.25) * 0.5 + 0.5,		\n"
+	"			cos(gl_FragCoord.y * 0.25) * 0.5 + 0.5,				\n"
+	"			sin(gl_FragCoord.x * 0.15) * cos(gl_FragCoord.y * 0.15),	\n"
+	"			1.0);												\n"
 	"}																\n"
 };
 
