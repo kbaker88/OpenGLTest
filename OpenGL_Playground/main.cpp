@@ -255,16 +255,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		MessageBox(WindowPtr, buffer, 0, 0);
 	}
 
-	//glAttachShader(ShaderProgram, GeometryShader);
-	//glGetProgramiv(ShaderProgram, GL_ATTACHED_SHADERS, &ErrorResult);
-	//if (ErrorResult == GL_FALSE)
-	//{
-	//	MessageBox(WindowPtr, "Error in attaching GeometryShader\n", 0, 0);
-	//	GLsizei returnedlength;
-	//	char buffer[256];
-	//	glGetProgramInfoLog(ShaderProgram, 256, &returnedlength, buffer);
-	//	MessageBox(WindowPtr, buffer, 0, 0);
-	//}
+	glAttachShader(ShaderProgram, GeometryShader);
+	glGetProgramiv(ShaderProgram, GL_ATTACHED_SHADERS, &ErrorResult);
+	if (ErrorResult == GL_FALSE)
+	{
+		MessageBox(WindowPtr, "Error in attaching GeometryShader\n", 0, 0);
+		GLsizei returnedlength;
+		char buffer[256];
+		glGetProgramInfoLog(ShaderProgram, 256, &returnedlength, buffer);
+		MessageBox(WindowPtr, buffer, 0, 0);
+	}
 
 	glAttachShader(ShaderProgram, FragmentShader);
 	glGetProgramiv(ShaderProgram, GL_ATTACHED_SHADERS, &ErrorResult);
