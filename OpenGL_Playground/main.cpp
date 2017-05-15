@@ -3,8 +3,9 @@
 #include "definitions.h"
 #include "shader.h"
 #include "collision_detection.h"
-#include "render_object.h"
 #include "debug.h"
+#include "render_object.h"
+#include "renderer.h"
 
 typedef HGLRC __stdcall wgl_create_context_attribs_arb(HDC hDC,
 	HGLRC hShareContext, const int *attribList);
@@ -27,7 +28,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	WindowsClassStructure.hCursor = LoadCursor(0, IDC_ARROW);
 	WindowsClassStructure.hbrBackground = (HBRUSH)(COLOR_WINDOW + 3);
 	WindowsClassStructure.lpszMenuName = 0;
-	WindowsClassStructure.lpszClassName = (const char*)"OpenGLPlayground";
+	WindowsClassStructure.lpszClassName = 
+		(const char*)"OpenGLPlayground";
 	WindowsClassStructure.hIconSm = LoadIcon(0, IDI_APPLICATION);
 
 	if (!RegisterClassEx(&WindowsClassStructure))
@@ -72,7 +74,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 			&DesiredPixelFormat);
 	if (SuggestedPixelFormatIndex == 0)
 	{
-		MessageBox(WindowPtr, "Obtaining Suggested Pixel Format Index Failed!",
+		MessageBox(WindowPtr,
+			"Obtaining Suggested Pixel Format Index Failed!",
 			"Error!",
 			MB_ICONEXCLAMATION | MB_OK);
 	}
@@ -90,14 +93,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	if (!SetPixelFormat(WindowDeviceContext,
 		SuggestedPixelFormatIndex, &SuggestedPixelFormat))
 	{
-		MessageBox(WindowPtr, "Setting Pixel Format Failed!", "Error!",
+		MessageBox(WindowPtr, 
+			"Setting Pixel Format Failed!", "Error!",
 			MB_ICONEXCLAMATION | MB_OK);
 	}
 
 	HGLRC OpenGLContext = wglCreateContext(WindowDeviceContext);
 	if (OpenGLContext == 0)
 	{
-		MessageBox(WindowPtr, "Obtaining OpenGL Render Context Failed!", "Error!",
+		MessageBox(WindowPtr,
+			 "Obtaining OpenGL Render Context Failed!", "Error!",
 			MB_ICONEXCLAMATION | MB_OK);
 	}
 
@@ -245,32 +250,23 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		0.0f, 1.0f, 0.0f,
 		0.0f, 1.0f, 0.0f
 	};
+	Model Triangle;
+	Triangle.NumAttribs = 2;
+	Triangle.Data = new float*[Triangle.NumAttribs];
+	Triangle.ArraySize = new unsigned int[Triangle.NumAttribs];
 
-	GLenum Error;
-	GLuint VertexArrayObject;
-	GLuint Buffers[2];
-	glCreateVertexArrays(1, &VertexArrayObject);
-	glCreateBuffers(2, &Buffers[0]);
+	Triangle.Data[0] = VerticeData;
+	Triangle.ArraySize[0] = 3 * 3 * sizeof(float);
+	Triangle.Data[1] = ColorData;
+	Triangle.ArraySize[1] = 3 * 3 * sizeof(float);
 
-
-	glNamedBufferStorage(Buffers[0], sizeof(VerticeData), VerticeData, 0);
-	glVertexArrayVertexBuffer(VertexArrayObject, 0, Buffers[0], 0, sizeof(float) * 3);
-	glVertexArrayAttribFormat(VertexArrayObject, 0, 3, GL_FLOAT, GL_FALSE, 0);
-	glVertexArrayAttribBinding(VertexArrayObject, 0, 0);
-	glEnableVertexArrayAttrib(VertexArrayObject, 0);
-
-	// next
-	glNamedBufferStorage(Buffers[1], sizeof(ColorData), ColorData, 0);
-	glVertexArrayVertexBuffer(VertexArrayObject, 1, Buffers[1], 0, sizeof(float) * 3);
-	glVertexArrayAttribFormat(VertexArrayObject, 1, 3, GL_FLOAT, GL_FALSE, 0);
-	glVertexArrayAttribBinding(VertexArrayObject, 1, 1);
-	glEnableVertexArrayAttrib(VertexArrayObject, 1);
+	RenderObj MyTriangle;
+	RenderObj_CreateRenderObject(&MyTriangle, &Triangle);
 
 
-	glBindVertexArray(VertexArrayObject);
+	//Render_BindVertexArray(MyTriangle.VertexArrayID);
 
 	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
-
 
 	MSG Message = {};
 	while (Message.message != WM_QUIT)
@@ -292,7 +288,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		glPatchParameteri(GL_PATCH_VERTICES, 3);
 		glDrawArrays(GL_PATCHES, 0, 3);
 #else
-		glDrawArrays(GL_TRIANGLES, 0, 3);
+		Render_Draw(&MyTriangle);
 #endif
 
 #if DEBUG_MODE
@@ -306,12 +302,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 #endif
 	}
 
-	glDisableVertexArrayAttrib(VertexArrayObject, 0);
-	glDisableVertexArrayAttrib(VertexArrayObject, 1);
+	//glDisableVertexArrayAttrib(VertexArrayObject, 0);
+	//glDisableVertexArrayAttrib(VertexArrayObject, 1);
 	glBindVertexArray(0);
-	glDeleteVertexArrays(1, &VertexArrayObject);
+	//glDeleteVertexArrays(1, &VertexArrayObject);
 	glDeleteProgram(ShaderProgram);
 
+	glDeleteVertexArrays(1, &MyTriangle.VertexArrayID);
+	delete[] MyTriangle.BufferID;
+	delete[] Triangle.Data;
+	delete[] Triangle.ArraySize;
 	return Message.message;
 }
 

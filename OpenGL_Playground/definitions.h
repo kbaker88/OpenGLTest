@@ -4,7 +4,7 @@
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
 
-#define DEBUG_MODE 1;
+#define DEBUG_MODE 1
 
 typedef char GLchar;
 
@@ -54,12 +54,14 @@ typedef void __stdcall gl_link_program(GLuint program);
 typedef void __stdcall gl_delete_shader(GLuint shader);
 typedef void __stdcall gl_delete_program(GLuint program);
 typedef void __stdcall gl_use_program(GLuint program);
-typedef void __stdcall gl_get_shader_iv(GLuint shader, GLenum pname, GLint* params);
-typedef void __stdcall gl_get_shader_info_log(GLuint shader, GLsizei maxLength,
-	GLsizei* length, GLchar* infoLog);
-typedef void __stdcall gl_get_program_iv(GLuint program, GLenum pname, GLint* params);
-typedef void __stdcall gl_get_program_info_log(GLuint program, GLsizei maxLength,
-	GLsizei* length, GLchar* infoLog);
+typedef void __stdcall gl_get_shader_iv(GLuint shader, GLenum pname, 
+	GLint* params);
+typedef void __stdcall gl_get_shader_info_log(GLuint shader, 
+	GLsizei maxLength, GLsizei* length, GLchar* infoLog);
+typedef void __stdcall gl_get_program_iv(GLuint program, GLenum pname,
+	GLint* params);
+typedef void __stdcall gl_get_program_info_log(GLuint program,
+	GLsizei maxLength, GLsizei* length, GLchar* infoLog);
 typedef void __stdcall gl_gen_buffers(GLsizei n, GLuint* buffers);
 typedef void __stdcall gl_bind_buffer(GLenum target, GLuint buffer);
 typedef void __stdcall gl_buffer_sub_data(GLenum target, GLint* offset, 
@@ -70,9 +72,10 @@ typedef void* __stdcall gl_map_buffer_range(GLenum target, GLint* offset,
 typedef GLboolean __stdcall gl_unmap_buffer(GLenum target);
 typedef void __stdcall gl_enable_vertex_attrib_array(GLuint index);
 typedef void __stdcall gl_disable_vertex_attrib_array(GLuint index);
-typedef void __stdcall gl_vertex_attrib_3fv(GLuint index, const GLfloat* v);
-typedef void __stdcall gl_vertex_attrib_4fv(GLuint index, const GLfloat* v);
-
+typedef void __stdcall gl_vertex_attrib_3fv(GLuint index,
+	const GLfloat* v);
+typedef void __stdcall gl_vertex_attrib_4fv(GLuint index,
+	const GLfloat* v);
 
 static gl_create_shader* glCreateShader;
 static gl_shader_source* glShaderSource;
@@ -115,9 +118,10 @@ static gl_vertex_attrib_4fv* glVertexAttrib4fv;
 #define GL_MAP_UNSYNCHRONIZED_BIT         0x0020
 #define GL_INVALID_FRAMEBUFFER_OPERATION  0x0506
 
-typedef void __stdcall gl_clear_buffer_fv(GLenum Buffer, GLint drawBuffer,
-	const GLfloat *value);
-typedef void __stdcall gl_delete_vertex_arrays(GLsizei n, const GLuint* arrays);
+typedef void __stdcall gl_clear_buffer_fv(GLenum Buffer, 
+	GLint drawBuffer, const GLfloat *value);
+typedef void __stdcall gl_delete_vertex_arrays(GLsizei n, 
+	const GLuint* arrays);
 
 static gl_clear_buffer_fv* glClearBufferfv;
 static gl_delete_vertex_arrays* glDeleteVertexArrays;
@@ -128,7 +132,8 @@ static gl_delete_vertex_arrays* glDeleteVertexArrays;
 #define GL_COPY_WRITE_BUFFER              0x8F37
 
 typedef void __stdcall gl_copy_buffer_sub_data(GLenum readTarget,
-	GLenum writeTarget, GLint* readOffset, GLint* writeOffset, GLsizei* size);
+	GLenum writeTarget, GLint* readOffset, GLint* writeOffset,
+	GLsizei* size);
 
 static gl_copy_buffer_sub_data* glCopyBufferSubData;
 
@@ -170,7 +175,8 @@ typedef void __stdcall gl_vertex_attrib_binding(GLuint attribindex,
 typedef void __stdcall gl_bind_vertex_buffer(GLuint bindingindex,
 	GLuint buffer, GLint* offset, GLint* stride);
 typedef void __stdcall gl_vertex_attrib_ib_format(GLuint attribindex,
-	GLint size, GLenum type, GLboolean normalized, GLuint relativeoffset);
+	GLint size, GLenum type, GLboolean normalized,
+	GLuint relativeoffset);
 typedef void __stdcall gl_vertex_attrib_ibi_format(GLuint attribindex,
 	GLint size, GLenum type, GLuint relativeoffset);
 typedef void __stdcall gl_vertex_attrib_ibl_format(GLuint attribindex,
@@ -196,22 +202,25 @@ typedef void __stdcall gl_buffer_storage(GLenum target, GLsizei* size,
 static gl_buffer_storage* glBufferStorage;
 
 // OpenGL 4.5
-typedef void __stdcall gl_create_vertex_arrays(GLsizei n, GLuint* arrays);
+typedef void __stdcall gl_create_vertex_arrays(GLsizei n,
+	GLuint* arrays);
 typedef void __stdcall gl_bind_vertex_array(GLuint array);
 typedef void __stdcall gl_create_buffers(GLsizei n, GLuint *buffers);
-typedef void __stdcall gl_named_buffer_storage(GLuint buffer, GLsizei size,
-	const void* data, GLbitfield flags);
-typedef void* __stdcall gl_map_named_buffer(GLuint buffer, GLenum access);
+typedef void __stdcall gl_named_buffer_storage(GLuint buffer, 
+	GLsizei size, const void* data, GLbitfield flags);
+typedef void* __stdcall gl_map_named_buffer(GLuint buffer,
+	GLenum access);
 typedef GLboolean __stdcall gl_unmap_named_buffer(GLuint buffer);
-typedef void* __stdcall gl_map_named_buffer_range(GLuint buffer, GLint* offset,
-	GLsizei length, GLbitfield access);
+typedef void* __stdcall gl_map_named_buffer_range(GLuint buffer,
+	GLint* offset, GLsizei length, GLbitfield access);
 typedef void __stdcall gl_clear_named_buffer_sub_data(GLuint buffer,
 	GLenum internalformat, GLint* offset, GLsizei size,
 	GLenum format, GLenum type, const void* data);
 typedef void __stdcall gl_copy_named_buffer_sub_data(GLuint readBuffer,
-	GLuint writeBuffer, GLint* readOffset, GLint* writeOffset, GLsizei size);
-typedef void __stdcall gl_named_buffer_sub_data(GLuint buffer, GLint* offset, 
-	GLsizei size, const void *data);
+	GLuint writeBuffer, GLint* readOffset, GLint* writeOffset,
+	GLsizei size);
+typedef void __stdcall gl_named_buffer_sub_data(GLuint buffer,
+	GLint* offset, GLsizei size, const void *data);
 typedef void __stdcall gl_vertex_array_attrib_binding(GLuint vaobj,
 	GLuint attribindex, GLuint bindingindex);
 typedef void __stdcall gl_vertex_array_vertex_buffer(GLuint vaobj,

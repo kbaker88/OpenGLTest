@@ -1,6 +1,6 @@
-#if DEBUG_MODE
 #ifndef DEBUG_H
 #define DEBUG_H
+#if DEBUG_MODE
 
 void Debug_ShaderCompile(unsigned int Shader)
 {

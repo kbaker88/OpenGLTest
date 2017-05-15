@@ -128,6 +128,7 @@
     <ClInclude Include="collision_detection.h" />
     <ClInclude Include="debug.h" />
     <ClInclude Include="definitions.h" />
+    <ClInclude Include="renderer.h" />
     <ClInclude Include="render_object.h" />
     <ClInclude Include="shader.h" />
   </ItemGroup>
