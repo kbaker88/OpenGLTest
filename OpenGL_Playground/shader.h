@@ -1,29 +1,37 @@
 #ifndef SHADER_H
 #define SHADER_H
 
+#define TESSELLATION_CONTROL_SHADER 0
+#define TESSELLATION_EVAL_SHADER 0
+#define GEOMETRY_SHADER 0
+
+#define VERTEX_TO_FRAGMENT 1 //TODO: Remove, temporary
+
 static const char* VertexShader_Source[] =
 {
 	"#version 450 core												\n"
 	"																\n"
-	"layout (location = 0) in vec4 offset;							\n"
-	"layout (location = 1) in vec4 color;							\n"
+	"layout (location = 0) in vec3 position;						\n"
+	"layout (location = 1) in vec3 color;							\n"
 	"																\n"
-	//"out VS_OUT														\n"
-	//"{																\n"
-	//"	vec4 color;													\n"
-	//"} vs_out;														\n"
+#if VERTEX_TO_FRAGMENT
+	"out VS_OUT														\n"
+	"{																\n"
+	"	vec3 color;													\n"
+	"} vs_out;														\n"
+#endif
 	"																\n"
 	"void main(void)												\n"
 	"{																\n"
-	"const vec4 vertices[3] = vec4[3] (vec4(0.25, -0.25, 0.5, 1.0),	\n"
-	"vec4(-0.25, -0.25, 0.5, 1.0),									\n"
-	"vec4(0.25, 0.25, 0.5, 1.0));									\n"
 	"																\n"
-	"	gl_Position = vertices[gl_VertexID] + offset;				\n"
-	//"	vs_out.color = color;										\n"
+#if VERTEX_TO_FRAGMENT
+	"	vs_out.color = color;										\n"
+#endif
+	"gl_Position = vec4(position, 1.0);								\n"
 	"}																\n"
 };
 
+#if TESSELLATION_CONTROL_SHADER
 static const char* TessellationControl_Source[] =
 {
 	"#version 450 core												\n"
@@ -45,7 +53,9 @@ static const char* TessellationControl_Source[] =
 	"																\n"
 	"}																\n"
 };
+#endif
 
+#if TESSELLATION_EVAL_SHADER
 static const char* TessellationEval_Source[] =
 {
 	"#version 450 core												\n"
@@ -59,7 +69,9 @@ static const char* TessellationEval_Source[] =
 	"				   gl_TessCoord.z * gl_in[2].gl_Position);		\n"
 	"}																\n"
 };
+#endif
 
+#if GEOMETRY_SHADER
 static const char* Geometry_Source[] =
 {
 	"#version 450 core												\n"
@@ -77,25 +89,31 @@ static const char* Geometry_Source[] =
 	"	}															\n"
 	"}																\n"
 };
+#endif
 
 static const char* FragmentShader_Source[] =
 {
 	"#version 450 core												\n"
 	"																\n"
-	//	"in VS_OUT														\n"
-	//	"{																\n"
-	//	"	vec4 color;													\n"
-	//	"} fs_in;														\n"
+#if VERTEX_TO_FRAGMENT
+	"in VS_OUT														\n"
+	"{																\n"
+	"	vec3 color;													\n"
+	"} fs_in;														\n"
+#endif
 	"																\n"
 	"out vec4 color;												\n"
 	"																\n"
 	"void main(void)												\n"
 	"{																\n"
-	//	"	color = fs_in.color;										\n"
+#if VERTEX_TO_FRAGMENT
+	"	color = vec4(fs_in.color, 1.0);								\n"
+#else
 	"	color = vec4(sin(gl_FragCoord.x * 0.25) * 0.5 + 0.5,		\n"
 	"			cos(gl_FragCoord.y * 0.25) * 0.5 + 0.5,				\n"
-	"			sin(gl_FragCoord.x * 0.15) * cos(gl_FragCoord.y * 0.15),	\n"
+	"			sin(gl_FragCoord.x * 0.15) * cos(gl_FragCoord.y * 0.15),\n"
 	"			1.0);												\n"
+#endif
 	"}																\n"
 };
 

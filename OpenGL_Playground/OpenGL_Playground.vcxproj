@@ -120,10 +120,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="collision_detection.cpp" />
+    <ClCompile Include="debugcpp.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="collision_detection.h" />
+    <ClInclude Include="debug.h" />
     <ClInclude Include="definitions.h" />
+    <ClInclude Include="render_object.h" />
     <ClInclude Include="shader.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

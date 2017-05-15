@@ -2,7 +2,9 @@
 #include <gl\GL.h>
 #include "definitions.h"
 #include "shader.h"
-#include <glm/glm.hpp>
+#include "collision_detection.h"
+#include "render_object.h"
+#include "debug.h"
 
 typedef HGLRC __stdcall wgl_create_context_attribs_arb(HDC hDC,
 	HGLRC hShareContext, const int *attribList);
@@ -112,7 +114,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 			int Attribs[] =
 			{
 				WGL_CONTEXT_MAJOR_VERSION_ARB, 4,
-				WGL_CONTEXT_MINOR_VERSION_ARB, 3,
+				WGL_CONTEXT_MINOR_VERSION_ARB, 5,
 				WGL_CONTEXT_FLAGS_ARB,
 				WGL_CONTEXT_DEBUG_BIT_ARB, // TODO: Remove Debug for final
 				WGL_CONTEXT_PROFILE_MASK_ARB,
@@ -153,155 +155,124 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	GLuint VertexShader = glCreateShader(GL_VERTEX_SHADER);
 	glShaderSource(VertexShader, 1, VertexShader_Source, NULL);
 	glCompileShader(VertexShader);
-
-	GLint ErrorResult = 0;
-	glGetShaderiv(VertexShader, GL_COMPILE_STATUS, &ErrorResult);
-	if (ErrorResult == GL_FALSE)
-	{
-		MessageBox(WindowPtr, "Error in compiling VertexShader\n", 0, 0);
-		GLsizei returnedlength;
-		char buffer[256];
-		glGetShaderInfoLog(VertexShader, 256, &returnedlength, buffer);
-		MessageBox(WindowPtr, buffer, 0, 0);
-	}
-
+#if TESSELLATION_CONTROL_SHADER
 	GLuint TessellationControlShader = glCreateShader(GL_TESS_CONTROL_SHADER);
 	glShaderSource(TessellationControlShader, 1, TessellationControl_Source, NULL);
 	glCompileShader(TessellationControlShader);
-
-	glGetShaderiv(TessellationControlShader, GL_COMPILE_STATUS, &ErrorResult);
-	if (ErrorResult == GL_FALSE)
-	{
-		MessageBox(WindowPtr, "Error in compiling TessellationControlShader\n", 0, 0);
-		GLsizei returnedlength;
-		char buffer[256];
-		glGetShaderInfoLog(TessellationControlShader, 256, &returnedlength, buffer);
-		MessageBox(WindowPtr, buffer, 0, 0);
-	}
-
+#endif
+#if TESSELLATION_EVAL_SHADER
 	GLuint TessellationEvalShader = glCreateShader(GL_TESS_EVALUATION_SHADER);
 	glShaderSource(TessellationEvalShader, 1, TessellationEval_Source, NULL);
 	glCompileShader(TessellationEvalShader);
-
-	glGetShaderiv(TessellationEvalShader, GL_COMPILE_STATUS, &ErrorResult);
-	if (ErrorResult == GL_FALSE)
-	{
-		MessageBox(WindowPtr, "Error in compiling TessellationEvalShader\n", 0, 0);
-		GLsizei returnedlength;
-		char buffer[256];
-		glGetShaderInfoLog(TessellationEvalShader, 256, &returnedlength, buffer);
-		MessageBox(WindowPtr, buffer, 0, 0);
-	}
-
+#endif
+#if GEOMETRY_SHADER
 	GLuint GeometryShader = glCreateShader(GL_GEOMETRY_SHADER);
 	glShaderSource(GeometryShader, 1, Geometry_Source, NULL);
 	glCompileShader(GeometryShader);
-
-	glGetShaderiv(GeometryShader, GL_COMPILE_STATUS, &ErrorResult);
-	if (ErrorResult == GL_FALSE)
-	{
-		MessageBox(WindowPtr, "Error in compiling GeometryShader\n", 0, 0);
-		GLsizei returnedlength;
-		char buffer[256];
-		glGetShaderInfoLog(GeometryShader, 256, &returnedlength, buffer);
-		MessageBox(WindowPtr, buffer, 0, 0);
-	}
-
+#endif
 	GLuint FragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 	glShaderSource(FragmentShader, 1, FragmentShader_Source, NULL);
 	glCompileShader(FragmentShader);
-
-	glGetShaderiv(FragmentShader, GL_COMPILE_STATUS, &ErrorResult);
-	if (ErrorResult == GL_FALSE)
-	{
-		MessageBox(WindowPtr, "Error in compiling FragmentShader\n", 0, 0);
-		GLsizei returnedlength;
-		char buffer[256];
-		glGetShaderInfoLog(FragmentShader, 256, &returnedlength, buffer);
-		MessageBox(WindowPtr, buffer, 0, 0);
-	}
+#if DEBUG_MODE
+	Debug_ShaderCompile(VertexShader);
+	Debug_ShaderCompile(FragmentShader);
+#if TESSELLATION_CONTROL_SHADER
+	Debug_ShaderCompile(TessellationControlShader);
+#endif
+#if TESSELLATION_EVAL_SHADER
+	Debug_ShaderCompile(TessellationEvalShader);
+#endif
+#if GEOMETRY_SHADER
+	Debug_ShaderCompile(GeometryShader);
+#endif
+#endif
 
 	GLuint ShaderProgram = glCreateProgram();
 	glAttachShader(ShaderProgram, VertexShader);
-	glGetProgramiv(ShaderProgram, GL_ATTACHED_SHADERS, &ErrorResult);
-	if (ErrorResult == GL_FALSE)
-	{
-		MessageBox(WindowPtr, "Error in attaching VertexShader\n", 0, 0);
-		GLsizei returnedlength;
-		char buffer[256];
-		glGetProgramInfoLog(ShaderProgram, 256, &returnedlength, buffer);
-		MessageBox(WindowPtr, buffer, 0, 0);
-	}
-
+#if DEBUG_MODE
+	Debug_ShaderAttach(ShaderProgram);
+#endif
+#if TESSELLATION_CONTROL_SHADER
 	glAttachShader(ShaderProgram, TessellationControlShader);
-	glGetProgramiv(ShaderProgram, GL_ATTACHED_SHADERS, &ErrorResult);
-	if (ErrorResult == GL_FALSE)
-	{
-		MessageBox(WindowPtr, "Error in attaching TessellationControlShader\n", 0, 0);
-		GLsizei returnedlength;
-		char buffer[256];
-		glGetProgramInfoLog(ShaderProgram, 256, &returnedlength, buffer);
-		MessageBox(WindowPtr, buffer, 0, 0);
-	}
-
+#if DEBUG_MODE
+	Debug_ShaderAttach(ShaderProgram);
+#endif
+#endif
+#if TESSELLATION_EVAL_SHADER
 	glAttachShader(ShaderProgram, TessellationEvalShader);
-	glGetProgramiv(ShaderProgram, GL_ATTACHED_SHADERS, &ErrorResult);
-	if (ErrorResult == GL_FALSE)
-	{
-		MessageBox(WindowPtr, "Error in attaching TessellationEvalShader\n", 0, 0);
-		GLsizei returnedlength;
-		char buffer[256];
-		glGetProgramInfoLog(ShaderProgram, 256, &returnedlength, buffer);
-		MessageBox(WindowPtr, buffer, 0, 0);
-	}
-
+#if DEBUG_MODE
+	Debug_ShaderAttach(ShaderProgram);
+#endif
+#endif
+#if GEOMETRY_SHADER
 	glAttachShader(ShaderProgram, GeometryShader);
-	glGetProgramiv(ShaderProgram, GL_ATTACHED_SHADERS, &ErrorResult);
-	if (ErrorResult == GL_FALSE)
-	{
-		MessageBox(WindowPtr, "Error in attaching GeometryShader\n", 0, 0);
-		GLsizei returnedlength;
-		char buffer[256];
-		glGetProgramInfoLog(ShaderProgram, 256, &returnedlength, buffer);
-		MessageBox(WindowPtr, buffer, 0, 0);
-	}
-
+#if DEBUG_MODE
+	Debug_ShaderAttach(ShaderProgram);
+#endif
+#endif
 	glAttachShader(ShaderProgram, FragmentShader);
-	glGetProgramiv(ShaderProgram, GL_ATTACHED_SHADERS, &ErrorResult);
-	if (ErrorResult == GL_FALSE)
-	{
-		MessageBox(WindowPtr, "Error in attaching FragmentShader\n", 0, 0);
-		GLsizei returnedlength;
-		char buffer[256];
-		glGetProgramInfoLog(ShaderProgram, 256, &returnedlength, buffer);
-		MessageBox(WindowPtr, buffer, 0, 0);
-	}
+#if DEBUG_MODE
+	Debug_ShaderAttach(ShaderProgram);
+#endif
 
 	glLinkProgram(ShaderProgram);
-	glGetProgramiv(ShaderProgram, GL_LINK_STATUS, &ErrorResult);
-	if (ErrorResult == GL_FALSE)
-	{
-		MessageBox(WindowPtr, "Error in linking ShaderProgram\n", 0, 0);
-		GLsizei returnedlength;
-		char buffer[256];
-		glGetProgramInfoLog(ShaderProgram, 256, &returnedlength, buffer);
-		MessageBox(WindowPtr, buffer, 0, 0);
-	}
+#if DEBUG_MODE
+	Debug_ShaderLink(ShaderProgram);
+#endif
 
 	glDeleteShader(VertexShader);
+#if TESSELLATION_CONTROL_SHADER
 	glDeleteShader(TessellationControlShader);
+#endif
+#if TESSELLATION_EVAL_SHADER
 	glDeleteShader(TessellationEvalShader);
+#endif
+#if GEOMETRY_SHADER
 	glDeleteShader(GeometryShader);
+#endif
 	glDeleteShader(FragmentShader);
 
-	GLuint VertexArrayObject;
+	float VerticeData[] = 
+	{
+		0.25f, -0.25f, 0.5f,
+		-0.25f, -0.25f, 0.5f,
+		0.25f, 0.25f, 0.5f
+	};
 
+	float ColorData[] =
+	{
+		0.0f, 1.0f, 0.0f,
+		0.0f, 1.0f, 0.0f,
+		0.0f, 1.0f, 0.0f
+	};
+
+	GLenum Error;
+	GLuint VertexArrayObject;
+	GLuint Buffers[2];
 	glCreateVertexArrays(1, &VertexArrayObject);
+	glCreateBuffers(2, &Buffers[0]);
+
+
+	glNamedBufferStorage(Buffers[0], sizeof(VerticeData), VerticeData, 0);
+	glVertexArrayVertexBuffer(VertexArrayObject, 0, Buffers[0], 0, sizeof(float) * 3);
+	glVertexArrayAttribFormat(VertexArrayObject, 0, 3, GL_FLOAT, GL_FALSE, 0);
+	glVertexArrayAttribBinding(VertexArrayObject, 0, 0);
+	glEnableVertexArrayAttrib(VertexArrayObject, 0);
+
+	// next
+	glNamedBufferStorage(Buffers[1], sizeof(ColorData), ColorData, 0);
+	glVertexArrayVertexBuffer(VertexArrayObject, 1, Buffers[1], 0, sizeof(float) * 3);
+	glVertexArrayAttribFormat(VertexArrayObject, 1, 3, GL_FLOAT, GL_FALSE, 0);
+	glVertexArrayAttribBinding(VertexArrayObject, 1, 1);
+	glEnableVertexArrayAttrib(VertexArrayObject, 1);
+
+
 	glBindVertexArray(VertexArrayObject);
 
 	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
-	MSG Message = {};
 
+
+	MSG Message = {};
 	while (Message.message != WM_QUIT)
 	{
 		if (PeekMessage(&Message, 0, 0, 0, PM_REMOVE))
@@ -315,22 +286,28 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
 		glUseProgram(ShaderProgram);
 
-		GLfloat ColorAttrib[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-		GLfloat VertexAttrib[] = { 0.5f, 0.0f, 0.0f, 0.0f };
-		glVertexAttrib4fv(0, VertexAttrib);
-		glVertexAttrib4fv(1, ColorAttrib);
-
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		//	glPatchParameteri(GL_PATCH_VERTICES, 3);
-		glDrawArrays(GL_PATCHES, 0, 3);
 
+#if TESSELLATION_CONTROL_SHADER
+		glPatchParameteri(GL_PATCH_VERTICES, 3);
+		glDrawArrays(GL_PATCHES, 0, 3);
+#else
+		glDrawArrays(GL_TRIANGLES, 0, 3);
+#endif
+
+#if DEBUG_MODE
 		if (!SwapBuffers(WindowDeviceContext))
 		{
 			MessageBox(WindowPtr, "Swapping Buffers Failed!", "Error!",
 				MB_ICONEXCLAMATION | MB_OK);
 		}
+#else
+		SwapBuffers(WindowDeviceContext);
+#endif
 	}
 
+	glDisableVertexArrayAttrib(VertexArrayObject, 0);
+	glDisableVertexArrayAttrib(VertexArrayObject, 1);
 	glBindVertexArray(0);
 	glDeleteVertexArrays(1, &VertexArrayObject);
 	glDeleteProgram(ShaderProgram);
