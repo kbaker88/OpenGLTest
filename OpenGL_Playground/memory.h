@@ -37,6 +37,15 @@ unsigned int* Mem_Allocate(unsigned int* DataPtr, unsigned int Size)
 	return DataPtr;
 }
 
+char* Mem_Allocate(char* DataPtr, unsigned int Size)
+{
+	DataPtr = (char*)MemItr;
+	MemItr = (char*)MemItr + Size;
+	char* End = (char*)MemItr - 1;
+	*End = '\0';
+	return DataPtr;
+}
+
 void Mem_Shutdown()
 {
 	VirtualFree(MemoryStore, NumberOfPages * SystemInfo.dwPageSize,
