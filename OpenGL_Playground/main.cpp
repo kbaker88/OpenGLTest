@@ -1,10 +1,10 @@
 #include <Windows.h>
 #include <gl\GL.h>
+#include "memory.h"
 #include "definitions.h"
 #include "shader.h"
 #include "collision_detection.h"
 #include "debug.h"
-#include "render_object.h"
 #include "renderer.h"
 
 typedef HGLRC __stdcall wgl_create_context_attribs_arb(HDC hDC,
@@ -16,7 +16,7 @@ LRESULT CALLBACK WndProc(HWND WindowPtr, UINT msg, WPARAM wParam,
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	LPSTR lpCmdLine, int CommandShow)
 {
-
+	Mem_Initialize();
 	WNDCLASSEX WindowsClassStructure;
 	WindowsClassStructure.cbSize = sizeof(WNDCLASSEX);
 	WindowsClassStructure.style = CS_OWNDC;
@@ -251,9 +251,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		0.0f, 1.0f, 0.0f
 	};
 	Model Triangle;
+	Triangle.Data = 0;
+	Triangle.ArraySize = 0;
 	Triangle.NumAttribs = 2;
-	Triangle.Data = new float*[Triangle.NumAttribs];
-	Triangle.ArraySize = new unsigned int[Triangle.NumAttribs];
+	Triangle.Data = Mem_Allocate(Triangle.Data, Triangle.NumAttribs);
+	Triangle.ArraySize = Mem_Allocate(Triangle.ArraySize, Triangle.NumAttribs);
 
 	Triangle.Data[0] = VerticeData;
 	Triangle.ArraySize[0] = 3 * 3 * sizeof(float);
@@ -262,9 +264,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
 	RenderObj MyTriangle;
 	RenderObj_CreateRenderObject(&MyTriangle, &Triangle);
-
-
-	//Render_BindVertexArray(MyTriangle.VertexArrayID);
 
 	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 
@@ -309,9 +308,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	glDeleteProgram(ShaderProgram);
 
 	glDeleteVertexArrays(1, &MyTriangle.VertexArrayID);
-	delete[] MyTriangle.BufferID;
-	delete[] Triangle.Data;
-	delete[] Triangle.ArraySize;
+
+	Mem_Shutdown();
+
 	return Message.message;
 }
 

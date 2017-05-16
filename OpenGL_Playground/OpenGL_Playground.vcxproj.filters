@@ -21,9 +21,6 @@
     <ClCompile Include="collision_detection.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="debugcpp.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="definitions.h">
@@ -35,13 +32,13 @@
     <ClInclude Include="collision_detection.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="render_object.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="debug.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="renderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="memory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -93,8 +93,9 @@ Render_Draw(RenderObj* RenderObject)
 void
 RenderObj_CreateRenderObject(RenderObj* RenderObject, Model* ModelObj)
 {
-	// TODO: Make sure this is cleaned
-	RenderObject->BufferID = new unsigned int[ModelObj->NumAttribs];
+	//RenderObject->BufferID = new unsigned int[ModelObj->NumAttribs];
+	RenderObject->BufferID = Mem_Allocate(RenderObject->BufferID,
+		ModelObj->NumAttribs);
 	RenderObject->NumVertices = 3;
 	//TODO: Think about creating many VAO's at once.
 	Render_CreateVertexArrays(1, &RenderObject->VertexArrayID);
