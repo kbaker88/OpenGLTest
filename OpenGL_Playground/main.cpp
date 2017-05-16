@@ -250,6 +250,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		0.0f, 1.0f, 0.0f,
 		0.0f, 1.0f, 0.0f
 	};
+
+	char* CharPtr = 0;
+	CharPtr = Mem_Allocate(CharPtr, 2);
+	*CharPtr = 'A';
+
 	Model Triangle;
 	Triangle.Data = 0;
 	Triangle.ArraySize = 0;
