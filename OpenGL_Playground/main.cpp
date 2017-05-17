@@ -109,23 +109,33 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	//TODO: Assumes OpenGL right now. Make more generalized for DirectX also
 	if (wglMakeCurrent(WindowDeviceContext, OpenGLContext))
 	{
-		//MessageBoxA(0, (char*)glGetString(GL_VERSION), "OPENGL VERSION", 0);
 		wgl_create_context_attribs_arb *wglCreateContextAttribsARB =
 			(wgl_create_context_attribs_arb *)wglGetProcAddress(
 				"wglCreateContextAttribsARB");
-
+		
 		if (wglCreateContextAttribsARB)
 		{
+			char* OpenGLVersion = (char*)glGetString(GL_VERSION);
+			int MajorVersion = (int)(OpenGLVersion[0] - 48);
+			int Minor = (int)(OpenGLVersion[2] - 48);
+			if (MajorVersion < 3)
+			{
+				MessageBox(WindowPtr, 
+					"OpenGL Version is too outdated to run this application.", 0, 0);
+				return 1;
+			}
+			
 			int Attribs[] =
 			{
-				WGL_CONTEXT_MAJOR_VERSION_ARB, 4,
-				WGL_CONTEXT_MINOR_VERSION_ARB, 5,
+				WGL_CONTEXT_MAJOR_VERSION_ARB, MajorVersion,
+				WGL_CONTEXT_MINOR_VERSION_ARB, Minor,
 				WGL_CONTEXT_FLAGS_ARB,
 				WGL_CONTEXT_DEBUG_BIT_ARB, // TODO: Remove Debug for final
 				WGL_CONTEXT_PROFILE_MASK_ARB,
 				WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB,
 				0
 			};
+
 			HGLRC ShareContext = 0;
 			HGLRC ModernContext =
 				wglCreateContextAttribsARB(WindowDeviceContext,
