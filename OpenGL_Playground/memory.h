@@ -25,7 +25,6 @@ float** Mem_Allocate(float** DataPtr, unsigned int Size)
 {
 	DataPtr = (float**)MemItr;
 	MemItr = (float**)MemItr + Size;
-	char* T = (char*)MemItr;
 	return DataPtr;
 }
 
@@ -33,7 +32,6 @@ unsigned int* Mem_Allocate(unsigned int* DataPtr, unsigned int Size)
 {
 	DataPtr = (unsigned int*)MemItr;
 	MemItr = (unsigned int*)MemItr + Size;
-	char* T = (char*)MemItr;
 	return DataPtr;
 }
 

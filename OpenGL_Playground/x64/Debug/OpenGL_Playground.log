@@ -1,3 +1,4 @@
 ﻿  main.cpp
-  OpenGL_Playground.vcxproj -> C:\Users\kevin\Documents\GitHub\OpenGLTest\x64\Debug\OpenGL_Playground.exe
-  OpenGL_Playground.vcxproj -> C:\Users\kevin\Documents\GitHub\OpenGLTest\x64\Debug\OpenGL_Playground.pdb (Partial PDB)
+  LINK : C:\Users\Kevin\Documents\GitHub\OpenGLTest\x64\Debug\OpenGL_Playground.exe not found or not built by the last incremental link; performing full link
+  OpenGL_Playground.vcxproj -> C:\Users\Kevin\Documents\GitHub\OpenGLTest\x64\Debug\OpenGL_Playground.exe
+  OpenGL_Playground.vcxproj -> C:\Users\Kevin\Documents\GitHub\OpenGLTest\x64\Debug\OpenGL_Playground.pdb (Partial PDB)
