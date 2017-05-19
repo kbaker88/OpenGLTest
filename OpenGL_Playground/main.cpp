@@ -86,7 +86,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		sizeof(SuggestedPixelFormat), &SuggestedPixelFormat))
 	{
 		MessageBox(WindowPtr,
-			"Obtaining Description of a Possible Pixel Format Failed!", "Error!",
+			"Obtaining Description of a Possible Pixel Format Failed!",
+			"Error!",
 			MB_ICONEXCLAMATION | MB_OK);
 	}
 
@@ -121,7 +122,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 			if (MajorVersion < 3)
 			{
 				MessageBox(WindowPtr, 
-					"OpenGL Version is too outdated to run this application.", 0, 0);
+					"OpenGL Version is too outdated to run this application.", 
+					0, 0);
 				return 1;
 			}
 			
@@ -165,122 +167,148 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	//glEnable(GL_DEPTH_TEST);
 	OpenGL_InitializeFunctions();
 
+#if OPENGL2_0
 	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+#endif // OpenGL 2.0
 
+#if OPENGL2_0
 	GLuint VertexShader = glCreateShader(GL_VERTEX_SHADER);
 	glShaderSource(VertexShader, 1, VertexShader_Source, NULL);
 	glCompileShader(VertexShader);
+#if OPENGL4_0
 #if TESSELLATION_CONTROL_SHADER
-	GLuint TessellationControlShader = glCreateShader(GL_TESS_CONTROL_SHADER);
-	glShaderSource(TessellationControlShader, 1, TessellationControl_Source, NULL);
+	GLuint TessellationControlShader = 
+		glCreateShader(GL_TESS_CONTROL_SHADER);
+	glShaderSource(TessellationControlShader, 1, 
+		TessellationControl_Source, NULL);
 	glCompileShader(TessellationControlShader);
-#endif
+#endif // TESSELLATION_CONTROL_SHADER
 #if TESSELLATION_EVAL_SHADER
-	GLuint TessellationEvalShader = glCreateShader(GL_TESS_EVALUATION_SHADER);
-	glShaderSource(TessellationEvalShader, 1, TessellationEval_Source, NULL);
+	GLuint TessellationEvalShader = 
+		glCreateShader(GL_TESS_EVALUATION_SHADER);
+	glShaderSource(TessellationEvalShader, 1, 
+		TessellationEval_Source, NULL);
 	glCompileShader(TessellationEvalShader);
-#endif
+#endif // TESSELLATION_EVAL_SHADER
+#endif // OpenGL 4.0
+#if OPENGL3_2	
 #if GEOMETRY_SHADER
 	GLuint GeometryShader = glCreateShader(GL_GEOMETRY_SHADER);
 	glShaderSource(GeometryShader, 1, Geometry_Source, NULL);
 	glCompileShader(GeometryShader);
-#endif
+#endif // GEOMETRY_SHADER
+#endif // OpenGL 3.2
 	GLuint FragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 	glShaderSource(FragmentShader, 1, FragmentShader_Source, NULL);
 	glCompileShader(FragmentShader);
 #if DEBUG_MODE
 	Debug_ShaderCompile(VertexShader);
 	Debug_ShaderCompile(FragmentShader);
+#if OPENGL4_0
 #if TESSELLATION_CONTROL_SHADER
 	Debug_ShaderCompile(TessellationControlShader);
-#endif
+#endif // TESSELLATION_CONTROL_SHADER
 #if TESSELLATION_EVAL_SHADER
 	Debug_ShaderCompile(TessellationEvalShader);
-#endif
+#endif // TESSELLATION_EVAL_SHADER
+#endif // OpenGL 4.0
+#if OPENGL3_2	
 #if GEOMETRY_SHADER
 	Debug_ShaderCompile(GeometryShader);
-#endif
-#endif
-
+#endif // GEOMETRY_SHADER
+#endif // OpenGL 3.2
+#endif // DEBUG_MODE
 	GLuint ShaderProgram = glCreateProgram();
 	glAttachShader(ShaderProgram, VertexShader);
 #if DEBUG_MODE
 	Debug_ShaderAttach(ShaderProgram);
-#endif
+#endif // DEBUG_MODE
+#if OPENGL4_0
 #if TESSELLATION_CONTROL_SHADER
 	glAttachShader(ShaderProgram, TessellationControlShader);
 #if DEBUG_MODE
 	Debug_ShaderAttach(ShaderProgram);
-#endif
-#endif
+#endif // DEBUG_MODE
+#endif // TESSELLATION_CONTROL_SHADER
 #if TESSELLATION_EVAL_SHADER
 	glAttachShader(ShaderProgram, TessellationEvalShader);
 #if DEBUG_MODE
 	Debug_ShaderAttach(ShaderProgram);
-#endif
-#endif
+#endif // DEBUG_MODE
+#endif // TESSELLATION_EVAL_SHADER
+#endif // OpenGL 4.0
+#if OPENGL3_2
 #if GEOMETRY_SHADER
 	glAttachShader(ShaderProgram, GeometryShader);
 #if DEBUG_MODE
 	Debug_ShaderAttach(ShaderProgram);
-#endif
-#endif
+#endif // DEBUG_MODE
+#endif // GEOMETRY_SHADER
+#endif // OpenGL 3.2
 	glAttachShader(ShaderProgram, FragmentShader);
 #if DEBUG_MODE
 	Debug_ShaderAttach(ShaderProgram);
-#endif
-
+#endif // DEBUG_MODE
 	glLinkProgram(ShaderProgram);
 #if DEBUG_MODE
 	Debug_ShaderLink(ShaderProgram);
-#endif
+#endif // DEBUG_MODE
 
 	glDeleteShader(VertexShader);
+#if OPENGL4_0
 #if TESSELLATION_CONTROL_SHADER
 	glDeleteShader(TessellationControlShader);
-#endif
+#endif // TESSELLATION_CONTROL_SHADER
 #if TESSELLATION_EVAL_SHADER
 	glDeleteShader(TessellationEvalShader);
-#endif
+#endif // TESSELLATION_EVAL_SHADER
+#endif // OpenGL 4.0
+#if OPENGL3_2
 #if GEOMETRY_SHADER
 	glDeleteShader(GeometryShader);
-#endif
+#endif // GEOMETRY_SHADER
+#endif // OpenGL 3.2
 	glDeleteShader(FragmentShader);
+#endif // OpenGL 2.0
 
-	float VerticeData[] = 
-	{
-		0.25f, -0.25f, 0.5f,
-		-0.25f, -0.25f, 0.5f,
-		0.25f, 0.25f, 0.5f
-	};
-
-	float ColorData[] =
-	{
-		0.0f, 1.0f, 0.0f,
-		0.0f, 1.0f, 0.0f,
-		0.0f, 1.0f, 0.0f
-	};
 
 	char* CharPtr = 0;
 	CharPtr = Mem_Allocate(CharPtr, 2);
 	*CharPtr = 'A';
 
 	Model Triangle;
-	Triangle.Data = 0;
-	Triangle.ArraySize = 0;
 	Triangle.NumAttribs = 2;
+	Triangle.Data = 0;
 	Triangle.Data = Mem_Allocate(Triangle.Data, Triangle.NumAttribs);
-	Triangle.ArraySize = Mem_Allocate(Triangle.ArraySize, Triangle.NumAttribs);
+	Triangle.ArraySize = 0;
+	Triangle.ArraySize = Mem_Allocate(Triangle.ArraySize, 
+		Triangle.NumAttribs);
 
-	Triangle.Data[0] = VerticeData;
 	Triangle.ArraySize[0] = 3 * 3 * sizeof(float);
-	Triangle.Data[1] = ColorData;
+	// NOTE: Vertices
+	Triangle.Data[0] = Mem_Allocate(Triangle.Data[0], 9);
+	Triangle.Data[0][0] = 0.25f; Triangle.Data[0][1] = 
+		-0.25f; Triangle.Data[0][2] = 0.5f;
+	Triangle.Data[0][3] = -0.25f; Triangle.Data[0][4] =
+		-0.25f; Triangle.Data[0][5] = 0.5f;
+	Triangle.Data[0][6] = 0.25f; Triangle.Data[0][7] = 
+		0.25f; Triangle.Data[0][8] = 0.5f;
+
 	Triangle.ArraySize[1] = 3 * 3 * sizeof(float);
+	// NOTE: Color
+	Triangle.Data[1] = Mem_Allocate(Triangle.Data[1], 9);
+	Triangle.Data[1][0] = 0.0f; Triangle.Data[1][1] =
+		1.0f; Triangle.Data[1][2] = 0.0f;
+	Triangle.Data[1][3] = 0.0f; Triangle.Data[1][4] =
+		1.0f; Triangle.Data[1][5] = 0.0f;
+	Triangle.Data[1][6] = 0.0f; Triangle.Data[1][7] =
+		1.0f; Triangle.Data[1][8] = 0.0f;
 
 	RenderObj MyTriangle;
 	RenderObj_CreateRenderObject(&MyTriangle, &Triangle);
 
-	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+	//glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+
 
 	MSG Message = {};
 	while (Message.message != WM_QUIT)
@@ -291,11 +319,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 			DispatchMessage(&Message);
 		}
 
+#if OPENGL3_0
 		glClearBufferfv(GL_COLOR, 0,
 			glm::vec4(0.0f, 0.0f, 0.0f, 1.0f).data);
-
+#endif // OpenGL 3.0
+#if OPENGL2_0
 		glUseProgram(ShaderProgram);
-
+#endif // OpenGL 2.0
+		// OpenGL 1.1
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 #if TESSELLATION_CONTROL_SHADER
@@ -303,7 +334,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		glDrawArrays(GL_PATCHES, 0, 3);
 #else
 		Render_Draw(&MyTriangle);
-#endif
+#endif // TESSELLATION_CONTROL_SHADER
 
 #if DEBUG_MODE
 		if (!SwapBuffers(WindowDeviceContext))
@@ -313,7 +344,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		}
 #else
 		SwapBuffers(WindowDeviceContext);
-#endif
+#endif // DEBUG_MODE
 	}
 
 	//glDisableVertexArrayAttrib(VertexArrayObject, 0);
@@ -330,7 +361,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 }
 
 
-LRESULT CALLBACK WndProc(HWND WindowPtr, UINT Message, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK WndProc(HWND WindowPtr, UINT Message, 
+	WPARAM wParam, LPARAM lParam)
 {
 
 	switch (Message)

@@ -8,6 +8,19 @@
 
 typedef char GLchar;
 
+#define OPENGL2_0 1
+#define OPENGL2_1 1
+#define OPENGL3_0 1
+#define OPENGL3_1 1
+#define OPENGL3_2 1
+#define OPENGL4_0 1
+#define OPENGL4_1 1
+#define OPENGL4_2 1
+#define OPENGL4_3 1
+#define OPENGL4_4 1
+#define OPENGL4_5 1
+
+#if OPENGL2_0
 // Accepted values for attribute names for the OpenGL Context(WGL)
 #define WGL_CONTEXT_MAJOR_VERSION_ARB			  0x2091
 #define WGL_CONTEXT_MINOR_VERSION_ARB			  0x2092
@@ -102,10 +115,12 @@ static gl_disable_vertex_attrib_array* glDisableVertexAttribArray;
 static gl_vertex_attrib_3fv* glVertexAttrib3fv;
 static gl_vertex_attrib_4fv* glVertexAttrib4fv;
 
+#if OPENGL2_1
 // OpenGL 2.1
 #define GL_PIXEL_PACK_BUFFER              0x88EB
 #define GL_PIXEL_UNPACK_BUFFER            0x88EC
 
+#if OPENGL3_0
 // OpenGL 3.0
 #define GL_TRANSFORM_FEEDBACK_BUFFER_MODE 0x8C7F
 #define GL_TRANSFORM_FEEDBACK_VARYINGS    0x8C83
@@ -122,10 +137,13 @@ typedef void __stdcall gl_clear_buffer_fv(GLenum Buffer,
 	GLint drawBuffer, const GLfloat *value);
 typedef void __stdcall gl_delete_vertex_arrays(GLsizei n, 
 	const GLuint* arrays);
+typedef void __stdcall gl_bind_vertex_array(GLuint array);
 
 static gl_clear_buffer_fv* glClearBufferfv;
 static gl_delete_vertex_arrays* glDeleteVertexArrays;
+static gl_bind_vertex_array* glBindVertexArray;
 
+#if OPENGL3_1
 // OpenGL 3.1
 #define GL_TEXTURE_BUFFER                 0x8C2A
 #define GL_COPY_READ_BUFFER               0x8F36
@@ -134,15 +152,21 @@ static gl_delete_vertex_arrays* glDeleteVertexArrays;
 typedef void __stdcall gl_copy_buffer_sub_data(GLenum readTarget,
 	GLenum writeTarget, GLint* readOffset, GLint* writeOffset,
 	GLsizei* size);
+typedef void __stdcall gl_get_uniform_indices(GLuint program,
+	GLsizei uniformCount, const GLchar** uniformNames,
+	GLuint *uniformIndices);
 
 static gl_copy_buffer_sub_data* glCopyBufferSubData;
+static gl_get_uniform_indices* glGetUniformIndices;
 
+#if OPENGL3_2
 // OpenGL 3.2
 #define GL_GEOMETRY_SHADER                0x8DD9
 #define GL_GEOMETRY_VERTICES_OUT          0x8916
 #define GL_GEOMETRY_INPUT_TYPE            0x8917
 #define GL_GEOMETRY_OUTPUT_TYPE           0x8918
 
+#if OPENGL4_0
 // OpenGL 4.0
 #define GL_TESS_EVALUATION_SHADER         0x8E87
 #define GL_TESS_CONTROL_SHADER            0x8E88
@@ -154,13 +178,16 @@ typedef void __stdcall gl_patch_parameter_i(GLenum pname, GLint value);
 
 static gl_patch_parameter_i* glPatchParameteri;
 
+#if OPENGL4_1
 // OpenGL 4.1
 #define GL_PROGRAM_BINARY_LENGTH          0x8741
 
+#if OPENGL4_2
 // OpenGL 4.2
 #define GL_ACTIVE_ATOMIC_COUNTER_BUFFERS  0x92D9
 #define GL_ATOMIC_COUNTER_BUFFER          0x92C0
 
+#if OPENGL4_3
 // OpenGL 4.3
 #define GL_COMPUTE_SHADER                 0x91B9
 #define GL_COMPUTE_WORK_GROUP_SIZE        0x8267
@@ -189,6 +216,7 @@ static gl_vertex_attrib_ib_format*  glVertexAttribFormat;
 static gl_vertex_attrib_ibi_format* glVertexAttribIFormat;
 static gl_vertex_attrib_ibl_format* glVertexAttribLFormat;
 
+#if OPENGL4_4
 // OpenGL 4.4
 #define GL_QUERY_BUFFER                   0x9192
 #define GL_DYNAMIC_STORAGE_BIT            0x0100
@@ -201,10 +229,10 @@ typedef void __stdcall gl_buffer_storage(GLenum target, GLsizei* size,
 
 static gl_buffer_storage* glBufferStorage;
 
+#if OPENGL4_5
 // OpenGL 4.5
 typedef void __stdcall gl_create_vertex_arrays(GLsizei n,
 	GLuint* arrays);
-typedef void __stdcall gl_bind_vertex_array(GLuint array);
 typedef void __stdcall gl_create_buffers(GLsizei n, GLuint *buffers);
 typedef void __stdcall gl_named_buffer_storage(GLuint buffer, 
 	GLsizei size, const void* data, GLbitfield flags);
@@ -238,7 +266,6 @@ typedef void __stdcall gl_disable_vertex_array_attrib(GLuint vaobj,
 	GLuint index);
 
 static gl_create_vertex_arrays* glCreateVertexArrays;
-static gl_bind_vertex_array* glBindVertexArray;
 static gl_create_buffers* glCreateBuffers;
 static gl_named_buffer_storage* glNamedBufferStorage;
 static gl_map_named_buffer* glMapNamedBuffer;
@@ -254,9 +281,22 @@ static gl_vertex_array_attrib_ibi_format* glVertexArrayAttribIFormat;
 static gl_vertex_array_attrib_ibl_format* glVertexArrayAttribLFormat;
 static gl_enable_vertex_array_attrib* glEnableVertexArrayAttrib;
 static gl_disable_vertex_array_attrib* glDisableVertexArrayAttrib;
+#endif // OpenGL 4.5
+#endif // OpenGL 4.4
+#endif // OpenGL 4.3
+#endif // OpenGL 4.2
+#endif // OpenGL 4.1
+#endif // OpenGL 4.0
+#endif // OpenGL 3.2
+#endif // OpenGL 3.1
+#endif // OpenGL 3.0
+#endif // OpenGL 2.1
+#endif // OpenGL 2.0
 
 static void OpenGL_InitializeFunctions()
 {
+#if OPENGL2_0
+	// OpenGL 2.0
 	glCreateShader = (gl_create_shader *)wglGetProcAddress("glCreateShader");
 	glShaderSource = (gl_shader_source *)wglGetProcAddress("glShaderSource");
 	glCompileShader = (gl_compile_shader *)wglGetProcAddress("glCompileShader");
@@ -281,24 +321,45 @@ static void OpenGL_InitializeFunctions()
 	glVertexAttrib3fv = (gl_vertex_attrib_3fv *)wglGetProcAddress("glVertexAttrib3fv");
 	glVertexAttrib4fv = (gl_vertex_attrib_4fv *)wglGetProcAddress("glVertexAttrib4fv");
 
+#if OPENGL2_1
+
+#if OPENGL3_0
+	// OpenGL 3.0
 	glClearBufferfv = (gl_clear_buffer_fv *)wglGetProcAddress("glClearBufferfv");
 	glDeleteVertexArrays = (gl_delete_vertex_arrays *)wglGetProcAddress("glDeleteVertexArrays");
+	glBindVertexArray = (gl_bind_vertex_array *)wglGetProcAddress("glBindVertexArray");
 
+#if OPENGL3_1
+	// OpenGL 3.1
 	glCopyBufferSubData = (gl_copy_buffer_sub_data *)wglGetProcAddress("glCopyBufferSubData");
+	glGetUniformIndices = (gl_get_uniform_indices *)wglGetProcAddress("glGetUniformIndices");
 
+#if OPENGL3_2
+
+#if OPENGL4_0
+	// OpenGL 4.0
 	glPatchParameteri = (gl_patch_parameter_i *)wglGetProcAddress("glPatchParameteri");
 
-	glClearBufferSubData = (gl_clear_buffer_sub_data *)wglGetProcAddress("glClearBufferSubData");
+#if OPENGL4_1
 
-	glBufferStorage = (gl_buffer_storage *)wglGetProcAddress("glBufferStorage");
+#if OPENGL4_2
+
+#if OPENGL4_3
+	// OpenGL 4.3
+	glClearBufferSubData = (gl_clear_buffer_sub_data *)wglGetProcAddress("glClearBufferSubData");
 	glVertexAttribBinding = (gl_vertex_attrib_binding *)wglGetProcAddress("glVertexAttribBinding");
 	glBindVertexBuffer = (gl_bind_vertex_buffer *)wglGetProcAddress("glBindVertexBuffer");
 	glVertexAttribFormat  = (gl_vertex_attrib_ib_format *)wglGetProcAddress("glVertexAttribFormat");
 	glVertexAttribIFormat = (gl_vertex_attrib_ibi_format *)wglGetProcAddress("glVertexAttribIFormat");
 	glVertexAttribLFormat = (gl_vertex_attrib_ibl_format *)wglGetProcAddress("glVertexAttribLFormat0o9");
+	
+#if OPENGL4_4
+	// OpenGL 4.4
+	glBufferStorage = (gl_buffer_storage *)wglGetProcAddress("glBufferStorage");
 
+#if OPENGL4_5
+	// OpenGL 4.5
 	glCreateVertexArrays = (gl_create_vertex_arrays *)wglGetProcAddress("glCreateVertexArrays");
-	glBindVertexArray = (gl_bind_vertex_array *)wglGetProcAddress("glBindVertexArray");
 	glCreateBuffers = (gl_create_buffers*)wglGetProcAddress("glCreateBuffers");
 	glNamedBufferStorage = (gl_named_buffer_storage *)wglGetProcAddress("glNamedBufferStorage");
 	glMapNamedBuffer = (gl_map_named_buffer *)wglGetProcAddress("glMapNamedBuffer");
@@ -314,6 +375,17 @@ static void OpenGL_InitializeFunctions()
 	glVertexArrayAttribLFormat = (gl_vertex_array_attrib_ibl_format *)wglGetProcAddress("glVertexArrayAttribLFormat");
 	glEnableVertexArrayAttrib = (gl_enable_vertex_array_attrib *)wglGetProcAddress("glEnableVertexArrayAttrib");
 	glDisableVertexArrayAttrib = (gl_disable_vertex_array_attrib *)wglGetProcAddress("glDisableVertexArrayAttrib");
+#endif // OpenGL 4.5
+#endif // OpenGL 4.4
+#endif // OpenGL 4.3
+#endif // OpenGL 4.2
+#endif // OpenGL 4.1
+#endif // OpenGL 4.0
+#endif // OpenGL 3.2
+#endif // OpenGL 3.1
+#endif // OpenGL 3.0
+#endif // OpenGL 2.1
+#endif // OpenGL 2.0
 }
 
 #endif

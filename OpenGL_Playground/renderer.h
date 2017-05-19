@@ -21,22 +21,27 @@ void
 Render_CreateVertexArrays(unsigned int Amount,
 	unsigned int* IDArray)
 {
-
+#if OPENGL4_5
 	glCreateVertexArrays(Amount, IDArray);
+#endif // OpenGL 4.5
 }
 
 void
 Render_CreateBuffers(unsigned int Amount, 
 	unsigned int* BufferIDArray)
 {
+#if OPENGL4_5
 	glCreateBuffers(Amount, BufferIDArray);
+#endif // OpenGL 4.5
 }
 
 void
 Render_FillBuffer(unsigned int BufferID, unsigned int Size,
 	float* Data, unsigned int Flags)
 {
+#if OPENGL4_5
 	glNamedBufferStorage(BufferID, Size, Data, Flags);
+#endif // OpenGL 4.5
 }
 
 void
@@ -45,6 +50,7 @@ Render_FillVertexArrayData(unsigned int VertexArrayObject,
 	unsigned int Buffer, unsigned int SpaceOffset,
 	unsigned int StartOffset)
 {
+#if OPENGL4_5
 	glVertexArrayVertexBuffer(VertexArrayObject, BindingIndex,
 		Buffer, 0, sizeof(float) * SpaceOffset);
 	glVertexArrayAttribFormat(VertexArrayObject, AttribIndex,
@@ -53,14 +59,21 @@ Render_FillVertexArrayData(unsigned int VertexArrayObject,
 		BindingIndex);
 	// TODO: Find when to disable or if it is even worth doing.
 	glEnableVertexArrayAttrib(VertexArrayObject, BindingIndex);
+#endif // OpenGL 4.5
 }
 
 void
 Render_FillVertexArrayIndices(RenderObj* RenderObject)
 {
+#if OPENGL2_0
+#if OPENGL3_0
 	glBindVertexArray(RenderObject->VertexArrayID);
+#endif // OpenGL 3.0
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, RenderObject->IndiceID);
+#if OPENGL3_0
 	glBindVertexArray(0);
+#endif // OpenGL 3.0
+#endif // OpenGL 2.0
 }
 
 void
@@ -77,17 +90,25 @@ Render_FillVetexArrayObject(RenderObj* RenderObject,
 void
 Render_BindVertexArray(unsigned int VertexArrayObject)
 {
+#if OPENGL3_0
 	glBindVertexArray(VertexArrayObject);
+#endif // OpenGL 3.0
 }
 
 void
 Render_Draw(RenderObj* RenderObject)
 {
+#if OPENGL2_0
+#if OPENGL3_0
 	glBindVertexArray(RenderObject->VertexArrayID);
+#endif // OpenGL 3.0
 	//glBindTexture(GL_TEXTURE_2D, Texture);
 	glDrawArrays(GL_TRIANGLES, 0, RenderObject->NumVertices);
 	//glBindTexture(GL_TEXTURE_2D, 0);
+#if OPENGL3_0
 	glBindVertexArray(0);
+#endif // OpenGL 3.0
+#endif // OpenGL 2.0
 }
 
 void

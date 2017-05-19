@@ -4,6 +4,7 @@
 
 void Debug_ShaderCompile(unsigned int Shader)
 {
+#if OPENGL2_0
 	GLint ErrorResult = 0;
 	HWND Window = GetActiveWindow();
 	glGetShaderiv(Shader, GL_COMPILE_STATUS, &ErrorResult);
@@ -15,10 +16,12 @@ void Debug_ShaderCompile(unsigned int Shader)
 		glGetShaderInfoLog(Shader, 256, &returnedlength, buffer);
 		MessageBox(Window, buffer, 0, 0);
 	}
+#endif
 }
 
 void Debug_ShaderAttach(unsigned int Shader)
 {
+#if OPENGL2_0
 	GLint ErrorResult = 0;
 	HWND Window = GetActiveWindow();
 	glGetProgramiv(Shader, GL_ATTACHED_SHADERS, &ErrorResult);
@@ -30,10 +33,12 @@ void Debug_ShaderAttach(unsigned int Shader)
 		glGetShaderInfoLog(Shader, 256, &returnedlength, buffer);
 		MessageBox(Window, buffer, 0, 0);
 	}
+#endif
 }
 
 void Debug_ShaderLink(unsigned int Shader)
 {
+#if OPENGL2_0
 	GLint ErrorResult = 0;
 	HWND Window = GetActiveWindow();
 	glGetProgramiv(Shader, GL_LINK_STATUS, &ErrorResult);
@@ -45,6 +50,7 @@ void Debug_ShaderLink(unsigned int Shader)
 		glGetShaderInfoLog(Shader, 256, &returnedlength, buffer);
 		MessageBox(Window, buffer, 0, 0);
 	}
+#endif
 }
 
 

@@ -21,6 +21,13 @@ void Mem_Initialize()
 	MemItr = MemoryStore;
 }
 
+float* Mem_Allocate(float* DataPtr, unsigned int Size)
+{
+	DataPtr = (float*)MemItr;
+	MemItr = (float*)MemItr + Size;
+	return DataPtr;
+}
+
 float** Mem_Allocate(float** DataPtr, unsigned int Size)
 {
 	DataPtr = (float**)MemItr;
