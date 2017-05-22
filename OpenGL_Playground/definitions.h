@@ -155,9 +155,19 @@ typedef void __stdcall gl_copy_buffer_sub_data(GLenum readTarget,
 typedef void __stdcall gl_get_uniform_indices(GLuint program,
 	GLsizei uniformCount, const GLchar** uniformNames,
 	GLuint *uniformIndices);
+typedef void __stdcall gl_get_active_uniforms_iv(GLuint program,
+	GLsizei uniformCount, const GLuint* uniformIndices,
+	GLenum pname, GLint* params);
+typedef GLuint __stdcall gl_get_uniform_block_index(GLuint program,
+	const GLchar* uniformBlockName);
+typedef GLuint __stdcall gl_uniform_block_binding(GLuint program,
+	GLuint uniformBlockIndex, GLuint uniformBlockBinding);
 
 static gl_copy_buffer_sub_data* glCopyBufferSubData;
 static gl_get_uniform_indices* glGetUniformIndices;
+static gl_get_active_uniforms_iv* glGetActiveUniformsiv;
+static gl_get_uniform_block_index* glGetUniformBlockIndex;
+static gl_uniform_block_binding* glUniformBlockBinding;
 
 #if OPENGL3_2
 // OpenGL 3.2
@@ -319,8 +329,7 @@ static void OpenGL_InitializeFunctions()
 	glEnableVertexAttribArray = (gl_enable_vertex_attrib_array *)wglGetProcAddress("glEnableVertexAttribArray");
 	glDisableVertexAttribArray = (gl_disable_vertex_attrib_array *)wglGetProcAddress("glDisableVertexAttribArray");
 	glVertexAttrib3fv = (gl_vertex_attrib_3fv *)wglGetProcAddress("glVertexAttrib3fv");
-	glVertexAttrib4fv = (gl_vertex_attrib_4fv *)wglGetProcAddress("glVertexAttrib4fv");
-
+	glVertexAttrib4fv = (gl_vertex_attrib_4fv *)wglGetProcAddress("glVertexAttrib4fv");              
 #if OPENGL2_1
 
 #if OPENGL3_0
@@ -333,6 +342,9 @@ static void OpenGL_InitializeFunctions()
 	// OpenGL 3.1
 	glCopyBufferSubData = (gl_copy_buffer_sub_data *)wglGetProcAddress("glCopyBufferSubData");
 	glGetUniformIndices = (gl_get_uniform_indices *)wglGetProcAddress("glGetUniformIndices");
+	glGetActiveUniformsiv = (gl_get_active_uniforms_iv *)wglGetProcAddress("glGetActiveUniformsiv");
+	glGetUniformBlockIndex = (gl_get_uniform_block_index *)wglGetProcAddress("glGetUniformBlockIndex");
+	glUniformBlockBinding = (gl_uniform_block_binding *)wglGetProcAddress("glUniformBlockBinding");
 
 #if OPENGL3_2
 
