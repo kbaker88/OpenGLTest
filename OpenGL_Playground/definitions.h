@@ -17,8 +17,8 @@ typedef char GLchar;
 #define OPENGL4_1 1
 #define OPENGL4_2 1
 #define OPENGL4_3 1
-#define OPENGL4_4 1
-#define OPENGL4_5 1
+#define OPENGL4_4 0
+#define OPENGL4_5 0
 
 #if OPENGL2_0
 // Accepted values for attribute names for the OpenGL Context(WGL)
@@ -89,6 +89,8 @@ typedef void __stdcall gl_vertex_attrib_3fv(GLuint index,
 	const GLfloat* v);
 typedef void __stdcall gl_vertex_attrib_4fv(GLuint index,
 	const GLfloat* v);
+typedef void __stdcall gl_buffer_data(GLenum target,
+	GLsizei* size, const GLvoid * data, GLenum usage);
 
 static gl_create_shader* glCreateShader;
 static gl_shader_source* glShaderSource;
@@ -114,6 +116,7 @@ static gl_enable_vertex_attrib_array* glEnableVertexAttribArray;
 static gl_disable_vertex_attrib_array* glDisableVertexAttribArray;
 static gl_vertex_attrib_3fv* glVertexAttrib3fv;
 static gl_vertex_attrib_4fv* glVertexAttrib4fv;
+static gl_buffer_data* glBufferData;
 
 #if OPENGL2_1
 // OpenGL 2.1
@@ -329,7 +332,13 @@ static void OpenGL_InitializeFunctions()
 	glEnableVertexAttribArray = (gl_enable_vertex_attrib_array *)wglGetProcAddress("glEnableVertexAttribArray");
 	glDisableVertexAttribArray = (gl_disable_vertex_attrib_array *)wglGetProcAddress("glDisableVertexAttribArray");
 	glVertexAttrib3fv = (gl_vertex_attrib_3fv *)wglGetProcAddress("glVertexAttrib3fv");
+<<<<<<< HEAD
 	glVertexAttrib4fv = (gl_vertex_attrib_4fv *)wglGetProcAddress("glVertexAttrib4fv");              
+=======
+	glVertexAttrib4fv = (gl_vertex_attrib_4fv *)wglGetProcAddress("glVertexAttrib4fv");
+	glBufferData = (gl_buffer_data *)wglGetProcAddress("glBufferData");
+
+>>>>>>> afccc9bf4e0526bf2c463d3e8361b023ca2e30a2
 #if OPENGL2_1
 
 #if OPENGL3_0
