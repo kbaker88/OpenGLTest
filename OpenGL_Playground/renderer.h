@@ -32,15 +32,23 @@ Render_CreateBuffers(unsigned int Amount,
 {
 #if OPENGL4_5
 	glCreateBuffers(Amount, BufferIDArray);
-#endif // OpenGL 4.5
+#elif OPENGL4_3
+	glGenBuffers(Amount, BufferIDArray);
+#endif// OpenGL 4.5
 }
 
 void
-Render_FillBuffer(unsigned int BufferID, unsigned int Size,
+Render_FillBuffer(unsigned int BufferID, int Size,
 	float* Data, unsigned int Flags)
 {
 #if OPENGL4_5
+	// NOTE: Immutable storage. The data buffer cannot be resized.
 	glNamedBufferStorage(BufferID, Size, Data, Flags);
+	//NOTE: Resizable.
+	//glNamedBufferData();
+#elif OPENGL2_0
+	glBindBuffer(GL_ARRAY_BUFFER, BufferID);
+	glBufferData(GL_ARRAY_BUFFER, &Size, Data, Flags);
 #endif // OpenGL 4.5
 }
 
@@ -59,6 +67,8 @@ Render_FillVertexArrayData(unsigned int VertexArrayObject,
 		BindingIndex);
 	// TODO: Find when to disable or if it is even worth doing.
 	glEnableVertexArrayAttrib(VertexArrayObject, BindingIndex);
+#elif OPENGL2_0
+	
 #endif // OpenGL 4.5
 }
 
