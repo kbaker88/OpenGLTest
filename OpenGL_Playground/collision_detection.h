@@ -2,6 +2,7 @@
 #define COLLISION_DETECTION
 
 #include <glm/glm.hpp>
+#include <glm/gtx/transform.hpp>
 
 glm::vec3 Collision_NormalizeVector(glm::vec3 Vector);
 glm::vec3 Collision_GetPlaneNormal(glm::vec3 PointA,

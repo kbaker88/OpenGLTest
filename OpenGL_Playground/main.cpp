@@ -5,7 +5,9 @@
 #include "shader.h"
 #include "collision_detection.h"
 #include "debug.h"
+#include "model.h"
 #include "renderer.h"
+#include "bmp.h"
 
 typedef HGLRC __stdcall wgl_create_context_attribs_arb(HDC hDC,
 	HGLRC hShareContext, const int *attribList);
@@ -271,44 +273,162 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	glDeleteShader(FragmentShader);
 #endif // OpenGL 2.0
 
+	//Model Triangle;
+	//Triangle.NumAttribs = 2;
+	//Triangle.Data = 0;
+	//Triangle.Data = Mem_Allocate(Triangle.Data, Triangle.NumAttribs);
+	//Triangle.ArraySize = 0;
+	//Triangle.ArraySize = Mem_Allocate(Triangle.ArraySize, 
+	//	Triangle.NumAttribs);
+	//
+	//Triangle.ArraySize[0] = 3 * 3 * sizeof(float);
+	//// NOTE: Vertices
+	//Triangle.Data[0] = Mem_Allocate(Triangle.Data[0], 9);
+	//Triangle.Data[0][0] = 0.25f; Triangle.Data[0][1] = 
+	//	-0.25f; Triangle.Data[0][2] = 0.5f;
+	//Triangle.Data[0][3] = -0.25f; Triangle.Data[0][4] =
+	//	-0.25f; Triangle.Data[0][5] = 0.5f;
+	//Triangle.Data[0][6] = 0.25f; Triangle.Data[0][7] = 
+	//	0.25f; Triangle.Data[0][8] = 0.5f;
+	//
+	//Triangle.ArraySize[1] = 3 * 3 * sizeof(float);
+	//// NOTE: Color
+	//Triangle.Data[1] = Mem_Allocate(Triangle.Data[1], 9);
+	//Triangle.Data[1][0] = 0.0f; Triangle.Data[1][1] =
+	//	1.0f; Triangle.Data[1][2] = 0.0f;
+	//Triangle.Data[1][3] = 0.0f; Triangle.Data[1][4] =
+	//	1.0f; Triangle.Data[1][5] = 0.0f;
+	//Triangle.Data[1][6] = 0.0f; Triangle.Data[1][7] =
+	//	1.0f; Triangle.Data[1][8] = 0.0f;
+	//Model* MyBox = new Model{};
+	//Model_CreateBox(MyBox, 0.5f, 0.5f, 0.5f);
+	//
+	//RenderObj* BoxRenderObj = new RenderObj{};
+	//RenderObj_CreateRenderObject(BoxRenderObj, MyBox, 3 * 6 * 6);
+	Model* MyRectangle = new Model{};
+	ModelObj_CreateRectangle(MyRectangle, 2.0f, 2.0f);
 
-	char* CharPtr = 0;
-	CharPtr = Mem_Allocate(CharPtr, 2);
-	*CharPtr = 'A';
+	RenderObj* RectRenderObj = new RenderObj{};
+	RenderObj_CreateRenderObject(RectRenderObj, MyRectangle, 6);
 
-	Model Triangle;
-	Triangle.NumAttribs = 2;
-	Triangle.Data = 0;
-	Triangle.Data = Mem_Allocate(Triangle.Data, Triangle.NumAttribs);
-	Triangle.ArraySize = 0;
-	Triangle.ArraySize = Mem_Allocate(Triangle.ArraySize, 
-		Triangle.NumAttribs);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,
+		RectRenderObj->IndiceID);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+		(GLsizei*)&MyRectangle->IndiceCount,
+		MyRectangle->IndiceData,
+		GL_STATIC_DRAW);
+#if STD140
+	const char* UniformNames[4] = 
+	{
+		"TestManualBlock.scale",
+		"TestManualBlock.translation",
+		"TestManualBlock.rotation",
+		"TestManualBlock.projection_matrix"
+	};
 
-	Triangle.ArraySize[0] = 3 * 3 * sizeof(float);
-	// NOTE: Vertices
-	Triangle.Data[0] = Mem_Allocate(Triangle.Data[0], 9);
-	Triangle.Data[0][0] = 0.25f; Triangle.Data[0][1] = 
-		-0.25f; Triangle.Data[0][2] = 0.5f;
-	Triangle.Data[0][3] = -0.25f; Triangle.Data[0][4] =
-		-0.25f; Triangle.Data[0][5] = 0.5f;
-	Triangle.Data[0][6] = 0.25f; Triangle.Data[0][7] = 
-		0.25f; Triangle.Data[0][8] = 0.5f;
+	GLuint UniformIndices[4];
+	glGetUniformIndices(ShaderProgram, 1, UniformNames, UniformIndices);
 
-	Triangle.ArraySize[1] = 3 * 3 * sizeof(float);
-	// NOTE: Color
-	Triangle.Data[1] = Mem_Allocate(Triangle.Data[1], 9);
-	Triangle.Data[1][0] = 0.0f; Triangle.Data[1][1] =
-		1.0f; Triangle.Data[1][2] = 0.0f;
-	Triangle.Data[1][3] = 0.0f; Triangle.Data[1][4] =
-		1.0f; Triangle.Data[1][5] = 0.0f;
-	Triangle.Data[1][6] = 0.0f; Triangle.Data[1][7] =
-		1.0f; Triangle.Data[1][8] = 0.0f;
+	GLint UniformOffsets[4];
+	GLint ArrayStrides[4];
+	GLint MatrixStrides[4];
+	glGetActiveUniformsiv(ShaderProgram, 4, UniformIndices,
+		GL_UNIFORM_OFFSET, UniformOffsets);
+	glGetActiveUniformsiv(ShaderProgram, 4, UniformIndices,
+		GL_UNIFORM_ARRAY_STRIDE, ArrayStrides);
+	glGetActiveUniformsiv(ShaderProgram, 4, UniformIndices,
+		GL_UNIFORM_MATRIX_STRIDE, MatrixStrides);
 
-	RenderObj MyTriangle;
-	RenderObj_CreateRenderObject(&MyTriangle, &Triangle);
+	unsigned char* Buffer = (unsigned char*)malloc(4096);
+	*((float *)(Buffer + UniformOffsets[0])) = 3.0f;
+	((float *)(Buffer + UniformOffsets[1]))[0] = 1.0f;
+	((float *)(Buffer + UniformOffsets[1]))[1] = 2.0f;
+	((float *)(Buffer + UniformOffsets[1]))[2] = 3.0f;
 
-	//glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+	const GLfloat Rotations[] = {30.0f, 40.0f, 60.0f};
+	unsigned int Offset = UniformOffsets[2];
 
+	for (int n = 0; n < 3; n++)
+	{
+		*((float *)(Buffer + Offset)) = Rotations[n];
+		Offset += ArrayStrides[2];
+	}
+
+	const GLfloat Matrix[] =
+	{
+		1.0f, 2.0f, 3.0f, 4.0f,
+		9.0f, 8.0f, 7.0f, 6.0f,
+		2.0f, 4.0f, 6.0f, 8.0f,
+		1.0f, 3.0f, 5.0f, 7.0f
+	};
+	for (int i = 0; i < 4; i++)
+	{
+		GLuint offset = UniformOffsets[3] + MatrixStrides[3] * i;
+		for (int j = 0; j < 4; j++)
+		{
+			*((float *)(Buffer + Offset)) = Matrix[i * 4 + j];
+			offset += sizeof(GLfloat);
+		}
+	}
+#endif
+
+	glm::vec3 EyePosition(0.0f, 0.0f, 10.0f);
+	glm::vec3 UpVector(0.0f, 1.0f, 0.0f);
+	glm::vec3 LookAtPos(0.0f, 0.0f, 0.0f);
+	glm::mat4 ViewMatrix = glm::lookAt(EyePosition, LookAtPos, UpVector);
+	glm::mat4 ProjectionMatrix = glm::perspective(45.0f, (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT , 0.01f, 1000.0f);
+
+	glm::mat4 ModelMatrix = glm::mat4();
+	//ModelMatrix = glm::translate(ModelMatrix, glm::vec3(0.5f, 0.0f, 0.0f));
+	//ModelMatrix = glm::rotate(ModelMatrix, 45.0f, glm::vec3(1.0f, 0.0f, 0.0f));
+	
+	GLuint texture;
+	glCreateTextures(GL_TEXTURE_2D, 1, &texture);
+	glTextureStorage2D(texture, 1, GL_RGBA8, 256, 256);
+	glBindTexture(GL_TEXTURE_2D, texture);
+
+	HANDLE ImageFile;
+	ImageFile = CreateFile("Images/container2.bmp", GENERIC_READ, FILE_SHARE_READ, 0,
+		OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+	DWORD FileSize = GetFileSize(ImageFile, 0);
+	unsigned char* Buffer = new unsigned char[FileSize] {};
+	LPDWORD BytesRead = 0;
+	ReadFile(ImageFile, (LPVOID)Buffer, FileSize, BytesRead, 0);
+	BmpDimensions ImageDimensions;
+	Buffer = GetBmpData(Buffer, ImageDimensions);
+
+	glTextureSubImage2D(texture, 0, 0, 0,
+		ImageDimensions.Width, ImageDimensions.Height,
+		GL_RGBA, GL_UNSIGNED_BYTE, Buffer);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+	///////////////////
+	//char* FileName = "test.bmp";
+	//struct stat buffer;
+	//stat(FileName, &buffer);
+	//
+	//unsigned char* ReturnValues = new unsigned char[buffer.st_size]();
+	//
+	//FILE* OpenFile;
+	//// NOTE: rb = Read Binary
+	//fopen_s(&OpenFile, FileName, "rb");
+	//
+	//if (OpenFile != 0)
+	//{
+	//	size_t NumberOfElementsRead = fread(ReturnValues,
+	//		sizeof(uint8), buffer.st_size, OpenFile);
+	//
+	//	fclose(OpenFile);
+	//}
+	//else
+	//{
+	//	// TODO: Error
+	//	Platform_TemporaryError("Failed to open file");
+	//	return 0;
+	//}
+	//////////////
 
 	MSG Message = {};
 	while (Message.message != WM_QUIT)
@@ -326,16 +446,21 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 #if OPENGL2_0
 		glUseProgram(ShaderProgram);
 #endif // OpenGL 2.0
-		// OpenGL 1.1
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
+		glUniformMatrix4fv(2, 1, GL_FALSE, &ModelMatrix[0][0]);
+		glUniformMatrix4fv(3, 1, GL_FALSE, &ViewMatrix[0][0]);
+		glUniformMatrix4fv(4, 1, GL_FALSE, &ProjectionMatrix[0][0]);
+		glUniform1i(5, 0);
+		glBindTexture(GL_TEXTURE_2D, texture);
+		// OpenGL 1.1
+	//	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 #if TESSELLATION_CONTROL_SHADER
 		glPatchParameteri(GL_PATCH_VERTICES, 3);
 		glDrawArrays(GL_PATCHES, 0, 3);
 #else
-		Render_Draw(&MyTriangle);
+		Render_Draw(RectRenderObj);
 #endif // TESSELLATION_CONTROL_SHADER
-
+		glBindTexture(GL_TEXTURE_2D, 0);
 #if DEBUG_MODE
 		if (!SwapBuffers(WindowDeviceContext))
 		{
@@ -347,13 +472,22 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 #endif // DEBUG_MODE
 	}
 
+#if STD140
+	free(Buffer);
+#endif
+	delete[] Buffer;
 	//glDisableVertexArrayAttrib(VertexArrayObject, 0);
 	//glDisableVertexArrayAttrib(VertexArrayObject, 1);
 	glBindVertexArray(0);
 	//glDeleteVertexArrays(1, &VertexArrayObject);
 	glDeleteProgram(ShaderProgram);
 
-	glDeleteVertexArrays(1, &MyTriangle.VertexArrayID);
+	//glDeleteVertexArrays(1, &BoxRenderObj->VertexArrayID);
+	//Model_Delete(MyBox);
+	//RenderObj_Delete(BoxRenderObj);
+	glDeleteVertexArrays(1, &RectRenderObj->VertexArrayID);
+	Model_Delete(MyRectangle);
+	RenderObj_Delete(RectRenderObj);
 
 	Mem_Shutdown();
 

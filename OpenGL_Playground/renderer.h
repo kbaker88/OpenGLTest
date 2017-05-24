@@ -1,14 +1,6 @@
 #ifndef RENDERER_H
 #define RENDERER_H
 
-struct Model
-{
-	float** Data;
-	float* IndiceData;
-	unsigned int* ArraySize;
-	unsigned int NumAttribs;
-};
-
 struct RenderObj  // Byte Total: 26
 {
 	// TODO: Is it better to pass as one big buffer?
@@ -16,6 +8,25 @@ struct RenderObj  // Byte Total: 26
 	unsigned int VertexArrayID, NumVertices,  // Bytes 12
 		IndiceID;
 };
+
+void
+RenderObj_Delete(RenderObj* Object)
+{
+	if (Object)
+	{
+		if (Object->BufferID)
+		{
+			delete[] Object->BufferID;
+			Object->BufferID = 0;
+		}
+		delete Object;
+		Object = 0;
+	}
+	else
+	{
+		// TODO: Error
+	}
+}
 
 void
 Render_CreateVertexArrays(unsigned int Amount,
@@ -122,12 +133,13 @@ Render_Draw(RenderObj* RenderObject)
 }
 
 void
-RenderObj_CreateRenderObject(RenderObj* RenderObject, Model* ModelObj)
+RenderObj_CreateRenderObject(RenderObj* RenderObject, Model* ModelObj,
+	unsigned int NumVertices)
 {
-	//RenderObject->BufferID = new unsigned int[ModelObj->NumAttribs];
-	RenderObject->BufferID = Mem_Allocate(RenderObject->BufferID,
-		ModelObj->NumAttribs);
-	RenderObject->NumVertices = 3;
+	RenderObject->BufferID = new unsigned int[ModelObj->NumAttribs];
+	//RenderObject->BufferID = Mem_Allocate(RenderObject->BufferID,
+	//	ModelObj->NumAttribs);
+	RenderObject->NumVertices = NumVertices;
 	//TODO: Think about creating many VAO's at once.
 	Render_CreateVertexArrays(1, &RenderObject->VertexArrayID);
 	Render_CreateBuffers(ModelObj->NumAttribs,

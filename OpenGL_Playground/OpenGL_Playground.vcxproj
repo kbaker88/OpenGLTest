@@ -134,10 +134,12 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="bmp.h" />
     <ClInclude Include="collision_detection.h" />
     <ClInclude Include="debug.h" />
     <ClInclude Include="definitions.h" />
     <ClInclude Include="memory.h" />
+    <ClInclude Include="model.h" />
     <ClInclude Include="renderer.h" />
     <ClInclude Include="shader.h" />
   </ItemGroup>

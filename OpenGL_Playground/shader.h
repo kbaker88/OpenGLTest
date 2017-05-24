@@ -16,13 +16,19 @@ static const char* VertexShader_Source[] =
 	"																\n"
 	"layout (location = 0) in vec3 position;						\n"
 	"layout (location = 1) in vec3 color;							\n"
+	"layout (location = 2) in vec2 texturecoordinate;				\n"
+	"																\n"
+	"uniform layout(location = 2) mat4 ModelMatrix;					\n"
+	"uniform layout(location = 3) mat4 ViewMatrix;					\n"
+	"uniform layout(location = 4) mat4 ProjectionMatrix;			\n"
+	"																\n"
 	"																\n"
 #if VERTEX_TO_FRAGMENT
 	"out VS_OUT														\n"
 	"{																\n"
 	"	vec3 color;													\n"
 	"} vs_out;														\n"
-	"																\n"
+	"out vec2 TexCoord;												\n"
 #endif // VERTEX_TO_FRAGMENT
 #if STD140
 	"layout (std140) uniform TestManualBlock						\n"
@@ -30,8 +36,8 @@ static const char* VertexShader_Source[] =
 	"	float scale;												\n"
 	"	vec3 translation;											\n"
 	"	float rotation[3];											\n"
-	"	mat4 projection_matrix										\n"
-	"}																\n"
+	"	mat4 projection_matrix;										\n"
+	"};																\n"
 #elif DEFAULT_UNIFORM
 	"uniform TransformBlock											\n"
 	"{																\n"
@@ -39,16 +45,18 @@ static const char* VertexShader_Source[] =
 	"	vec3 translation;											\n"
 	"	float rotation[3];											\n"
 	"	mat4 projection_matrix										\n"
-	"}																\n"
+	"};																\n"
 #endif // STD140 || DEFAULT_UNIFORM
 	"																\n"
 	"void main(void)												\n"
 	"{																\n"
 	"																\n"
 #if VERTEX_TO_FRAGMENT
-	"	vs_out.color = color;										\n"
+	"vs_out.color = color;											\n"
+	"TexCoord = texturecoordinate;									\n"
 #endif // VERTEX_TO_FRAGMENT
-	"gl_Position = vec4(position, 1.0);								\n"
+	"gl_Position = ProjectionMatrix * ViewMatrix *					\n"
+	"				ModelMatrix * vec4(position, 1.0);				\n"
 	"}																\n"
 };
 
@@ -122,13 +130,16 @@ static const char* FragmentShader_Source[] =
 	"	vec3 color;													\n"
 	"} fs_in;														\n"
 #endif // VERTEX_TO_FRAGMENT
+	"in vec2 TexCoord;												\n"
 	"																\n"
 	"out vec4 color;												\n"
+	"uniform layout(location = 5) sampler2D myTexture;\n"
 	"																\n"
 	"void main(void)												\n"
 	"{																\n"
 #if VERTEX_TO_FRAGMENT
-	"	color = vec4(fs_in.color, 1.0);								\n"
+	//"	color = vec4(fs_in.color, 1.0);								\n"
+	"	color = texture2D(myTexture, TexCoord);						\n"
 #else 
 	"	color = vec4(sin(gl_FragCoord.x * 0.25) * 0.5 + 0.5,		\n"
 	"			cos(gl_FragCoord.y * 0.25) * 0.5 + 0.5,				\n"
