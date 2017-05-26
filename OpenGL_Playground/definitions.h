@@ -40,6 +40,7 @@ typedef char GLchar;
 #define GL_ARRAY_BUFFER                   0x8892
 #define GL_ELEMENT_ARRAY_BUFFER           0x8893
 #define GL_STATIC_DRAW                    0x88E4
+typedef ptrdiff_t GLsizeiptr;
 
 // OpenGL 2.0
 #define GL_VERTEX_SHADER					0x8B31
@@ -71,18 +72,18 @@ typedef void __stdcall gl_use_program(GLuint program);
 typedef void __stdcall gl_get_shader_iv(GLuint shader, GLenum pname, 
 	GLint* params);
 typedef void __stdcall gl_get_shader_info_log(GLuint shader, 
-	GLsizei maxLength, GLsizei* length, GLchar* infoLog);
+	GLsizei maxLength, GLsizeiptr length, GLchar* infoLog);
 typedef void __stdcall gl_get_program_iv(GLuint program, GLenum pname,
 	GLint* params);
 typedef void __stdcall gl_get_program_info_log(GLuint program,
-	GLsizei maxLength, GLsizei* length, GLchar* infoLog);
+	GLsizei maxLength, GLsizeiptr length, GLchar* infoLog);
 typedef void __stdcall gl_gen_buffers(GLsizei n, GLuint* buffers);
 typedef void __stdcall gl_bind_buffer(GLenum target, GLuint buffer);
 typedef void __stdcall gl_buffer_sub_data(GLenum target, GLint* offset, 
-	GLsizei* size, const GLvoid * data);
+	GLsizeiptr size, const GLvoid * data);
 typedef void* __stdcall gl_map_buffer(GLenum target, GLenum access);
 typedef void* __stdcall gl_map_buffer_range(GLenum target, GLint* offset,
-	GLsizei* length, GLbitfield access);
+	GLsizeiptr length, GLbitfield access);
 typedef GLboolean __stdcall gl_unmap_buffer(GLenum target);
 typedef void __stdcall gl_enable_vertex_attrib_array(GLuint index);
 typedef void __stdcall gl_disable_vertex_attrib_array(GLuint index);
@@ -91,10 +92,15 @@ typedef void __stdcall gl_vertex_attrib_3fv(GLuint index,
 typedef void __stdcall gl_vertex_attrib_4fv(GLuint index,
 	const GLfloat* v);
 typedef void __stdcall gl_buffer_data(GLenum target,
-	GLsizei* size, const GLvoid * data, GLenum usage);
+	GLsizeiptr size, const GLvoid * data, GLenum usage);
 typedef void __stdcall gl_uniform_matrix_4fv(GLint location,
 	GLsizei count, GLboolean transpose, const GLfloat *value);
 typedef void __stdcall gl_uniform_1i(GLint location, GLint v0);
+typedef GLint __stdcall gl_get_uniform_location(GLuint program,
+	const GLchar* name);
+typedef void __stdcall gl_vertex_attrib_pointer(GLuint index,
+	GLint size, GLenum type, GLboolean normalized, GLsizei stride, 
+	const GLvoid* pointer);
 
 static gl_create_shader* glCreateShader;
 static gl_shader_source* glShaderSource;
@@ -123,6 +129,8 @@ static gl_vertex_attrib_4fv* glVertexAttrib4fv;
 static gl_buffer_data* glBufferData;
 static gl_uniform_matrix_4fv* glUniformMatrix4fv;
 static gl_uniform_1i* glUniform1i;
+static gl_get_uniform_location* glGetUniformLocation;
+static gl_vertex_attrib_pointer* glVertexAttribPointer;
 
 #if OPENGL2_1
 // OpenGL 2.1
@@ -141,6 +149,7 @@ static gl_uniform_1i* glUniform1i;
 #define GL_MAP_FLUSH_EXPLICIT_BIT         0x0010
 #define GL_MAP_UNSYNCHRONIZED_BIT         0x0020
 #define GL_INVALID_FRAMEBUFFER_OPERATION  0x0506
+#define GL_RGBA32F                        0x8814
 
 typedef void __stdcall gl_clear_buffer_fv(GLenum Buffer, 
 	GLint drawBuffer, const GLfloat *value);
@@ -171,7 +180,7 @@ static gl_bind_buffer_base* glBindBufferBase;
 
 typedef void __stdcall gl_copy_buffer_sub_data(GLenum readTarget,
 	GLenum writeTarget, GLint* readOffset, GLint* writeOffset,
-	GLsizei* size);
+	GLsizeiptr size);
 typedef void __stdcall gl_get_uniform_indices(GLuint program,
 	GLsizei uniformCount, const GLchar** uniformNames,
 	GLuint *uniformIndices);
@@ -230,7 +239,7 @@ static gl_tex_storage_2d* glTexStorage2D;
 #define GL_DISPATCH_INDIRECT_BUFFER       0x90EE
 
 typedef void __stdcall gl_clear_buffer_sub_data(GLenum target,
-	GLenum internalformat, GLint* offset, GLsizei* size,
+	GLenum internalformat, GLint* offset, GLsizeiptr size,
 	GLenum format, GLenum type, const void* data);
 typedef void __stdcall gl_vertex_attrib_binding(GLuint attribindex,
 	GLuint bindingindex);
@@ -259,7 +268,7 @@ static gl_vertex_attrib_ibl_format* glVertexAttribLFormat;
 #define GL_MAP_COHERENT_BIT               0x0080
 #define GL_CLIENT_STORAGE_BIT             0x0200
 
-typedef void __stdcall gl_buffer_storage(GLenum target, GLsizei* size,
+typedef void __stdcall gl_buffer_storage(GLenum target, GLsizeiptr size,
 	const GLvoid* data, GLbitfield flags);
 typedef void __stdcall gl_clear_tex_sub_image(GLuint texture,
 	GLint level, GLint xoffset, GLint yoffset, GLint zoffset,
@@ -374,6 +383,8 @@ static void OpenGL_InitializeFunctions()
 	glBufferData = (gl_buffer_data *)wglGetProcAddress("glBufferData");
 	glUniformMatrix4fv = (gl_uniform_matrix_4fv *)wglGetProcAddress("glUniformMatrix4fv");
 	glUniform1i = (gl_uniform_1i *)wglGetProcAddress("glUniform1i");
+	glGetUniformLocation = (gl_get_uniform_location *)wglGetProcAddress("glGetUniformLocation");
+	glVertexAttribPointer = (gl_vertex_attrib_pointer *)wglGetProcAddress("glVertexAttribPointer");
 
 #if OPENGL2_1
 

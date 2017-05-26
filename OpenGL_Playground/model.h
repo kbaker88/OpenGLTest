@@ -1,12 +1,13 @@
 #ifndef MODEL_H
 #define MODEL_H
 
-struct Model // Byte Total: 32
+struct Model // Byte Total: 40
 {
 	float** Data;						// Bytes 8
 	unsigned int* IndiceData;					// Bytes 8
 										// NOTE: ArraySize is the size in bytes.
 	unsigned int* ArraySize;					// Bytes 8
+	unsigned int* ArrayOffset;					// Bytes 8
 	unsigned int NumAttribs, IndiceCount;		// Bytes 8
 };
 
@@ -27,18 +28,15 @@ Model_Delete(Model* ModelObj)
 			delete[] ModelObj->Data;
 			ModelObj->Data = 0;
 		}
-		else
-		{
-			ModelObj->Data = 0;
-		}
 		if (ModelObj->ArraySize)
 		{
 			delete[] ModelObj->ArraySize;
 			ModelObj->ArraySize = 0;
 		}
-		else
+		if (ModelObj->ArrayOffset)
 		{
-			ModelObj->ArraySize = 0;
+			delete[] ModelObj->ArrayOffset;
+			ModelObj->ArrayOffset = 0;
 		}
 		delete ModelObj;
 		ModelObj = 0;
@@ -139,78 +137,66 @@ ModelObj_CreateRectangle(Model* ModelObj,
 	float HalfWidth = Width * 0.5f;
 	float HalfHeight = Height * 0.5f;
 	ModelObj->NumAttribs = 4;
-	ModelObj->IndiceCount = 6;
+	//ModelObj->IndiceCount = 6;
 
 	ModelObj->Data = new float*[ModelObj->NumAttribs]{};
 	ModelObj->ArraySize = new unsigned int[ModelObj->NumAttribs]{};
+	ModelObj->ArrayOffset = new unsigned int[ModelObj->NumAttribs]{};
 
 	ModelObj->Data[0] = new float[18]{};
 	ModelObj->Data[1] = new float[18]{};
-	ModelObj->Data[2] = new float[8]{};
+	ModelObj->Data[2] = new float[12]{};
 	ModelObj->Data[3] = new float[18]{};
 
-	ModelObj->IndiceData = new unsigned int[ModelObj->IndiceCount]{};
+	//ModelObj->IndiceData = new unsigned int[ModelObj->IndiceCount]{};
 
 	// NOTE: Vertice Data
 	ModelObj->ArraySize[0] = 18 * sizeof(float);
-	ModelObj->Data[0][0] = -HalfWidth; ModelObj->Data[0][1] = HalfHeight;
-	ModelObj->Data[0][2] = 0.0f;
-	ModelObj->Data[0][3] = HalfWidth; ModelObj->Data[0][4] = HalfHeight;
-	ModelObj->Data[0][5] = 0.0f;
-	ModelObj->Data[0][6] = HalfWidth; ModelObj->Data[0][7] = -HalfHeight;
-	ModelObj->Data[0][8] = 0.0f;
-	ModelObj->Data[0][9] = HalfWidth; ModelObj->Data[0][10] = -HalfHeight;
-	ModelObj->Data[0][11] = 0.0f;
-	ModelObj->Data[0][12] = -HalfWidth; ModelObj->Data[0][13] = -HalfHeight;
-	ModelObj->Data[0][14] = 0.0f;
-	ModelObj->Data[0][15] = -HalfWidth; ModelObj->Data[0][16] = HalfHeight;
-	ModelObj->Data[0][17] = 0.0f;
+	ModelObj->ArrayOffset[0] = 3;
+	ModelObj->Data[0][0] = -HalfWidth; ModelObj->Data[0][1]  = -HalfHeight; ModelObj->Data[0][2] =  0.0f;
+	ModelObj->Data[0][3] =  HalfWidth; ModelObj->Data[0][4]  = -HalfHeight; ModelObj->Data[0][5] =  0.0f;
+	ModelObj->Data[0][6] =  HalfWidth; ModelObj->Data[0][7]  =  HalfHeight; ModelObj->Data[0][8] =  0.0f;
+	ModelObj->Data[0][9] =  HalfWidth; ModelObj->Data[0][10] =  HalfHeight;	ModelObj->Data[0][11] = 0.0f;
+	ModelObj->Data[0][12] = -HalfWidth; ModelObj->Data[0][13] = HalfHeight; ModelObj->Data[0][14] = 0.0f;
+	ModelObj->Data[0][15] = -HalfWidth; ModelObj->Data[0][16] = -HalfHeight; ModelObj->Data[0][17] = 0.0f;
 
 	// NOTE: Color Data
 	ModelObj->ArraySize[1] = 18 * sizeof(float);
-	ModelObj->Data[1][0] = 1.0f, ModelObj->Data[1][1] = 0.0f,
-		ModelObj->Data[1][2] = 0.0f;
-	ModelObj->Data[1][3] = 1.0f, ModelObj->Data[1][4] = 0.0f,
-		ModelObj->Data[1][5] = 0.0f;
-	ModelObj->Data[1][6] = 1.0f, ModelObj->Data[1][7] = 0.0f,
-		ModelObj->Data[1][8] = 0.0f;
-	ModelObj->Data[1][9] = 1.0f, ModelObj->Data[1][10] = 0.0f,
-		ModelObj->Data[1][11] = 0.0f;
-	ModelObj->Data[1][12] = 1.0f, ModelObj->Data[1][13] = 0.0f,
-		ModelObj->Data[1][14] = 0.0f;
-	ModelObj->Data[1][15] = 1.0f, ModelObj->Data[1][16] = 0.0f,
-		ModelObj->Data[1][17] = 0.0f;
+	ModelObj->ArrayOffset[1] = 3;
+	ModelObj->Data[1][0] = 1.0f; ModelObj->Data[1][1] = 0.0f;  ModelObj->Data[1][2] = 0.0f;
+	ModelObj->Data[1][3] = 0.0f; ModelObj->Data[1][4] = 1.0f;  ModelObj->Data[1][5] = 0.0f;
+	ModelObj->Data[1][6] = 1.0f; ModelObj->Data[1][7] = 0.0f;  ModelObj->Data[1][8] = 0.0f;
+	ModelObj->Data[1][9] = 1.0f; ModelObj->Data[1][10] = 0.0f; ModelObj->Data[1][11] = 0.0f;
+	ModelObj->Data[1][12] = 0.0f; ModelObj->Data[1][13] = 0.0f; ModelObj->Data[1][14] = 1.0f;
+	ModelObj->Data[1][15] = 1.0f; ModelObj->Data[1][16] = 0.0f; ModelObj->Data[1][17] = 0.0f;
 
 	// NOTE: Texture Coordinates
-	ModelObj->ArraySize[2] = 8 * sizeof(float);
-	ModelObj->Data[2][0] = 0.0f, ModelObj->Data[2][1] = 0.0f;
-	ModelObj->Data[2][2] = 1.0f, ModelObj->Data[2][3] = 0.0f;
-	ModelObj->Data[2][4] = 1.0f, ModelObj->Data[2][5] = 1.0f;
-	ModelObj->Data[2][6] = 0.0f, ModelObj->Data[2][7] = 1.0f;
+	ModelObj->ArraySize[2] = 12 * sizeof(float);
+	ModelObj->ArrayOffset[2] = 2;
+	ModelObj->Data[2][0] = 0.0f; ModelObj->Data[2][1] = 0.0f;
+	ModelObj->Data[2][2] = 1.0f; ModelObj->Data[2][3] = 0.0f;
+	ModelObj->Data[2][4] = 1.0f; ModelObj->Data[2][5] = 1.0f;
+	ModelObj->Data[2][6] = 1.0f; ModelObj->Data[2][7] = 1.0f;
+	ModelObj->Data[2][8] = 0.0f; ModelObj->Data[2][9] = 1.0f;
+	ModelObj->Data[2][10] = 0.0f; ModelObj->Data[2][11] = 0.0f;
 
 	// NOTE: Normal Data
 	ModelObj->ArraySize[3] = 18 * sizeof(float);
-	ModelObj->Data[3][0] = 0.0f, ModelObj->Data[3][1] = 0.0f,
-		ModelObj->Data[3][2] = 1.0f;
-	ModelObj->Data[3][3] = 0.0f, ModelObj->Data[3][4] = 0.0f,
-		ModelObj->Data[3][5] = 1.0f;
-	ModelObj->Data[3][6] = 0.0f, ModelObj->Data[3][7] = 0.0f,
-		ModelObj->Data[3][8] = 1.0f;
-	ModelObj->Data[3][9] = 0.0f, ModelObj->Data[3][10] = 0.0f,
-		ModelObj->Data[3][11] = 1.0f;
-	ModelObj->Data[3][12] = 0.0f, ModelObj->Data[3][13] = 0.0f,
-		ModelObj->Data[3][14] = 1.0f;
-	ModelObj->Data[3][15] = 0.0f, ModelObj->Data[3][16] = 0.0f,
-		ModelObj->Data[3][17] = 1.0f;
+	ModelObj->ArrayOffset[3] = 3;
+	ModelObj->Data[3][0] = 0.0f; ModelObj->Data[3][1] = 0.0f; ModelObj->Data[3][2] = 1.0f;
+	ModelObj->Data[3][3] = 0.0f; ModelObj->Data[3][4] = 0.0f; ModelObj->Data[3][5] = 1.0f;
+	ModelObj->Data[3][6] = 0.0f; ModelObj->Data[3][7] = 0.0f; ModelObj->Data[3][8] = 1.0f;
+	ModelObj->Data[3][9] = 0.0f; ModelObj->Data[3][10] = 0.0f; ModelObj->Data[3][11] = 1.0f;
+	ModelObj->Data[3][12] = 0.0f; ModelObj->Data[3][13] = 0.0f; ModelObj->Data[3][14] = 1.0f;
+	ModelObj->Data[3][15] = 0.0f; ModelObj->Data[3][16] = 0.0f; ModelObj->Data[3][17] = 1.0f;
 
-	ModelObj->IndiceCount = ModelObj->IndiceCount;
 //	ModelObj->IndiceData = Indices;
-	ModelObj->IndiceData[0] = 0; 
-	ModelObj->IndiceData[1] = 1;
-	ModelObj->IndiceData[2] = 2;
-	ModelObj->IndiceData[3] = 2; 
-	ModelObj->IndiceData[4] = 3;
-	ModelObj->IndiceData[5] = 0;
+	//ModelObj->IndiceData[0] = 0; 
+	//ModelObj->IndiceData[1] = 1;
+	//ModelObj->IndiceData[2] = 2;
+	//ModelObj->IndiceData[3] = 2; 
+	//ModelObj->IndiceData[4] = 3;
+	//ModelObj->IndiceData[5] = 0;
 }
 
 void

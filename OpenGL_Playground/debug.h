@@ -11,9 +11,9 @@ void Debug_ShaderCompile(unsigned int Shader)
 	if (ErrorResult == GL_FALSE)
 	{
 		MessageBox(Window, "Error in compiling shader.\n", 0, 0);
-		GLsizei returnedlength;
+		GLsizeiptr returnedlength = 0;
 		char buffer[256];
-		glGetShaderInfoLog(Shader, 256, &returnedlength, buffer);
+		glGetShaderInfoLog(Shader, 256, returnedlength, buffer);
 		MessageBox(Window, buffer, 0, 0);
 	}
 #endif
@@ -28,9 +28,9 @@ void Debug_ShaderAttach(unsigned int Shader)
 	if (ErrorResult == GL_FALSE)
 	{
 		MessageBox(Window, "Error in attaching shader.\n", 0, 0);
-		GLsizei returnedlength;
+		GLsizeiptr returnedlength = 0;
 		char buffer[256];
-		glGetShaderInfoLog(Shader, 256, &returnedlength, buffer);
+		glGetShaderInfoLog(Shader, 256, returnedlength, buffer);
 		MessageBox(Window, buffer, 0, 0);
 	}
 #endif
@@ -45,9 +45,9 @@ void Debug_ShaderLink(unsigned int Shader)
 	if (ErrorResult == GL_FALSE)
 	{
 		MessageBox(Window, "Error in linking shader.\n", 0, 0);
-		GLsizei returnedlength;
+		GLsizeiptr returnedlength = 0;
 		char buffer[256];
-		glGetShaderInfoLog(Shader, 256, &returnedlength, buffer);
+		glGetShaderInfoLog(Shader, 256, returnedlength, buffer);
 		MessageBox(Window, buffer, 0, 0);
 	}
 #endif

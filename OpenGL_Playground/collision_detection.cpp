@@ -1,4 +1,4 @@
-#include "collision_detection.h"
+ #include "collision_detection.h"
 
 glm::vec3 Collision_NormalizeVector(glm::vec3 Vector)
 {
