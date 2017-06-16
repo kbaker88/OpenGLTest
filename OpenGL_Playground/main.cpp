@@ -436,7 +436,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
 #if STD140
 	free(Buffer);
-#endif
+#endif // STD140
 	delete[] Buffer;
 	//glDisableVertexArrayAttrib(VertexArrayObject, 0);
 	//glDisableVertexArrayAttrib(VertexArrayObject, 1);
